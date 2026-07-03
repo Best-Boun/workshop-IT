@@ -2,7 +2,7 @@ import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer className="site-footer bg-white py-5 border-top">
+    <footer id="contact" className="site-footer bg-white py-5 border-top">
       <div className="container">
         <div className="row gy-4">
           <div className="col-md-4">

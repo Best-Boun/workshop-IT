@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -11,6 +14,7 @@ const Navbar = () => {
   );
 
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -25,6 +29,33 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (location.pathname === "/products") {
+      const params = new URLSearchParams(location.search);
+      setSearchTerm(params.get("q") || "");
+    }
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const trimmed = searchTerm.trim();
+
+      if (location.pathname === "/products") {
+        const params = new URLSearchParams(location.search);
+        const current = (params.get("q") || "").trim();
+
+        if (current === trimmed) return;
+      }
+
+      if (!trimmed && location.pathname !== "/products") return;
+
+      const nextSearch = trimmed ? `?q=${encodeURIComponent(trimmed)}` : "";
+      navigate(`/products${nextSearch}`, { replace: true });
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, navigate, location.pathname, location.search]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -35,10 +66,52 @@ const Navbar = () => {
     window.location.href = "/login";
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = searchTerm.trim();
+    const nextSearch = trimmed ? `?q=${encodeURIComponent(trimmed)}` : "";
+    navigate(`/products${nextSearch}`);
+  };
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+
+    if (location.pathname === "/") {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
+
+    navigate("/");
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 50);
+  };
+
+  const handleContactClick = (e) => {
+    e.preventDefault();
+
+    const footerSection = document.getElementById("contact");
+
+    if (footerSection) {
+      footerSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <nav className="site-navbar navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
       <div className="container">
-        <Link className="navbar-brand fw-bold text-primary pe-3" to="/">
+        <Link
+          className="navbar-brand fw-bold text-primary pe-3"
+          to="/"
+          onClick={handleLogoClick}
+        >
           TechPulse
         </Link>
 
@@ -59,7 +132,10 @@ const Navbar = () => {
           id="mainNavbar"
         >
           {/* Search */}
-          <form className="d-none d-lg-flex mx-4 flex-grow-1 search-form">
+          <form
+            className="d-none d-lg-flex mx-4 flex-grow-1 search-form"
+            onSubmit={handleSearchSubmit}
+          >
             <div className="input-group">
               <span className="input-group-text bg-white border-end-0 text-muted">
                 🔍
@@ -69,6 +145,8 @@ const Navbar = () => {
                 type="search"
                 className="form-control border-start-0"
                 placeholder="Search components, brands..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </form>
@@ -93,7 +171,7 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="#contact">
+              <a className="nav-link" href="#contact" onClick={handleContactClick}>
                 Contact
               </a>
             </li>

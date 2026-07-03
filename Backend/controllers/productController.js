@@ -4,7 +4,8 @@ class ProductController {
   // GET /api/products
   static async getAllProducts(req, res) {
     try {
-      const products = await ProductModel.getAllProducts();
+      const { category, brand } = req.query;
+      const products = await ProductModel.getAllProducts({ category, brand });
 
       res.status(200).json({
         success: true,
@@ -17,6 +18,31 @@ class ProductController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch products",
+      });
+    }
+  }
+
+  // GET /api/products/search?q=
+  static async searchProducts(req, res) {
+    try {
+      const { q, category, brand } = req.query;
+      const products = await ProductModel.searchProducts({
+        q: q || "",
+        category,
+        brand,
+      });
+
+      res.status(200).json({
+        success: true,
+        count: products.length,
+        data: products,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to search products",
       });
     }
   }

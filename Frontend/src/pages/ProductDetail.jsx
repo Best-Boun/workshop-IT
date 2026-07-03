@@ -100,6 +100,23 @@ const ProductDetail = () => {
     setTimeout(() => setToast(null), 2200);
   };
 
+  const handleBuyNow = () => {
+    if (!product || stock <= 0) return;
+
+    navigate("/checkout", {
+      state: {
+        buyNowItem: {
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          price: product.price,
+          image: product.image,
+          quantity: safeQty,
+        },
+      },
+    });
+  };
+
   return (
     <div className="product-detail-page">
       <Navbar />
@@ -207,6 +224,14 @@ const ProductDetail = () => {
                       disabled={stock <= 0}
                     >
                       🛒 Add To Cart
+                    </button>
+
+                    <button
+                      className="btn btn-outline-primary rounded-pill px-4 fw-semibold"
+                      onClick={handleBuyNow}
+                      disabled={stock <= 0}
+                    >
+                      Buy Now
                     </button>
                   </div>
                 </div>

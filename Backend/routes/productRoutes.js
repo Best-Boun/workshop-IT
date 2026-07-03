@@ -6,6 +6,9 @@ const router = express.Router();
 // ดึงสินค้าทั้งหมด
 router.get("/", ProductController.getAllProducts);
 
+// ค้นหาสินค้า
+router.get("/search", ProductController.searchProducts);
+
 // ดึงสินค้าตามหมวด
 router.get("/category/:id", ProductController.getProductsByCategory);
 

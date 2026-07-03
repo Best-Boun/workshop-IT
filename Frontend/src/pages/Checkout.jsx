@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,6 +7,10 @@ import "../css/Checkout.css";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const buyNowItem = location.state?.buyNowItem;
+  const isBuyNowFlow = Boolean(buyNowItem && buyNowItem.id);
 
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,9 +24,23 @@ const Checkout = () => {
   });
 
   useEffect(() => {
+    if (isBuyNowFlow) {
+      setCart([
+        {
+          id: buyNowItem.id,
+          name: buyNowItem.name,
+          brand: buyNowItem.brand,
+          price: Number(buyNowItem.price) || 0,
+          image: buyNowItem.image,
+          quantity: Number(buyNowItem.quantity) > 0 ? Number(buyNowItem.quantity) : 1,
+        },
+      ]);
+      return;
+    }
+
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
-  }, []);
+  }, [isBuyNowFlow, buyNowItem]);
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = subtotal > 0 ? 50 : 0;
@@ -55,7 +73,11 @@ const Checkout = () => {
       });
 
       const orderId = res.data.data.orderId;
-      localStorage.removeItem("cart");
+
+      if (!isBuyNowFlow) {
+        localStorage.removeItem("cart");
+      }
+
       navigate(`/payment/${orderId}`, { state: { total } });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create order");

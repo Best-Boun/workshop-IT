@@ -1,22 +1,42 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
+const CATEGORY_OPTIONS = ["Computer Set", "Notebook"];
+const BRAND_OPTIONS = ["ASUS", "MSI", "Lenovo", "Dell", "HP", "Acer"];
+
 const Products = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null); // { name }
+  const [category, setCategory] = useState("");
+  const [brand, setBrand] = useState("");
+
+  const searchQuery = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return (params.get("q") || "").trim();
+  }, [location.search]);
 
   useEffect(() => {
+    setLoading(true);
+
+    const params = {};
+    if (category) params.category = category;
+    if (brand) params.brand = brand;
+    if (searchQuery) params.q = searchQuery;
+
+    const endpoint = searchQuery ? "/products/search" : "/products";
+
     api
-      .get("/products")
+      .get(endpoint, { params })
       .then((res) => setProducts(res.data.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [category, brand, searchQuery]);
 
   const addToCart = (product) => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -85,6 +105,63 @@ const Products = () => {
           ← Back
         </button>
 
+        {/* Filters */}
+        <div
+          className="bg-white rounded-4 shadow-sm p-3 p-md-4 mb-4"
+          style={{ border: "1px solid #e2e8f0" }}
+        >
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <p className="text-uppercase text-primary small fw-semibold mb-0">
+              Product Filters
+            </p>
+            {(category || brand) && (
+              <button
+                className="btn btn-outline-secondary btn-sm rounded-pill"
+                onClick={() => {
+                  setCategory("");
+                  setBrand("");
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+
+          <div className="row g-3">
+            <div className="col-md-6">
+              <label className="form-label fw-semibold text-dark mb-1">Category</label>
+              <select
+                className="form-select rounded-3"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                {CATEGORY_OPTIONS.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label className="form-label fw-semibold text-dark mb-1">Brand</label>
+              <select
+                className="form-select rounded-3"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              >
+                <option value="">All Brands</option>
+                {BRAND_OPTIONS.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         {loading ? (
           <div className="d-flex justify-content-center py-5">
             <div className="spinner-border text-primary" />
@@ -142,6 +219,23 @@ const Products = () => {
                         }}
                       >
                         {product.category}
+                      </span>
+                    )}
+
+                    {product.warranty && (
+                      <span
+                        className="badge rounded-pill mb-2"
+                        title={product.warranty_provider || "Warranty"}
+                        style={{
+                          background: "rgba(15,23,42,0.08)",
+                          color: "#334155",
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          alignSelf: "flex-start",
+                          padding: "0.3em 0.75em",
+                        }}
+                      >
+                        🛡 {product.warranty}
                       </span>
                     )}
 

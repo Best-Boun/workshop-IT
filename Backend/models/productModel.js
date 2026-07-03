@@ -2,8 +2,26 @@ import { pool } from "../config/db.js";
 
 class ProductModel {
   // ดึงสินค้าทั้งหมด
-  static async getAllProducts() {
-    const [rows] = await pool.query(`
+  static async getAllProducts(filters = {}) {
+    const { category, brand } = filters;
+
+    const whereConditions = ["p.status = 'active'"];
+    const params = [];
+
+    if (category) {
+      whereConditions.push("c.name = ?");
+      params.push(category);
+    }
+
+    if (brand) {
+      whereConditions.push("p.brand = ?");
+      params.push(brand);
+    }
+
+    const whereClause = whereConditions.join(" AND ");
+
+    const [rows] = await pool.query(
+      `
       SELECT
         p.id,
         p.sku,
@@ -13,6 +31,7 @@ class ProductModel {
         p.price,
         p.stock,
         p.warranty,
+        p.warranty_provider,
         p.image,
         p.featured,
         p.status,
@@ -20,9 +39,62 @@ class ProductModel {
       FROM products p
       JOIN categories c
       ON p.category_id = c.id
-      WHERE p.status = 'active'
+      WHERE ${whereClause}
       ORDER BY p.id DESC
-    `);
+      `,
+      params,
+    );
+
+    return rows;
+  }
+
+  // ค้นหาสินค้า (name, brand, description)
+  static async searchProducts(filters = {}) {
+    const { q = "", category, brand } = filters;
+    const keyword = `%${q.trim()}%`;
+
+    const whereConditions = [
+      "p.status = 'active'",
+      "(p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)",
+    ];
+    const params = [keyword, keyword, keyword];
+
+    if (category) {
+      whereConditions.push("c.name = ?");
+      params.push(category);
+    }
+
+    if (brand) {
+      whereConditions.push("p.brand = ?");
+      params.push(brand);
+    }
+
+    const whereClause = whereConditions.join(" AND ");
+
+    const [rows] = await pool.query(
+      `
+      SELECT
+        p.id,
+        p.sku,
+        p.name,
+        p.brand,
+        p.description,
+        p.price,
+        p.stock,
+        p.warranty,
+        p.warranty_provider,
+        p.image,
+        p.featured,
+        p.status,
+        c.name AS category
+      FROM products p
+      JOIN categories c
+      ON p.category_id = c.id
+      WHERE ${whereClause}
+      ORDER BY p.id DESC
+      `,
+      params,
+    );
 
     return rows;
   }
