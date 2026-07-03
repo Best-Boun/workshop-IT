@@ -1,0 +1,24 @@
+.featured-product-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.featured-product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 35px 80px rgba(15, 23, 42, 0.12);
+}
+
+.featured-product-card .product-thumb {
+  min-height: 220px;
+  border-radius: 1.75rem;
+  background: linear-gradient(180deg, #e0f2fe, #bae6fd 72%, #7dd3fc 100%);
+}
+
+.featured-product-card .product-rating {
+  letter-spacing: 0.04em;
+}
+
+.featured-product-card .badge-featured {
+  font-size: 0.8rem;
+}

@@ -1,0 +1,15 @@
+.home-page {
+  background: #f8fafc;
+}
+
+.home-page main {
+  overflow: hidden;
+}
+
+.home-page section {
+  position: relative;
+}
+
+.home-page section + section {
+  margin-top: 2rem;
+}

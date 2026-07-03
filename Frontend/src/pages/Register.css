@@ -1,0 +1,12 @@
+.register-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.register-page .card {
+  border-radius: 1.5rem;
+}
+
+.register-page .btn-google {
+  border-color: #ced4da;
+}
