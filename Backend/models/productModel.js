@@ -33,7 +33,8 @@ class ProductModel {
       `
       SELECT
         p.*,
-        c.name AS category
+        c.name AS category,
+        c.name AS category_name
       FROM products p
       JOIN categories c
       ON p.category_id = c.id

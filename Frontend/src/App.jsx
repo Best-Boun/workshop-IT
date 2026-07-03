@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import OverviewPage from "./pages/admin/OverviewPage";
 import SalesAnalyticsPage from "./pages/admin/SalesAnalyticsPage";
@@ -30,6 +31,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/products" element={<Products />} />
+      <Route path="/products/:id" element={<ProductDetail />} />
       <Route path="/cart" element={<Cart />} />
 
       {/* Protected routes (login required) */}

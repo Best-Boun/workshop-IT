@@ -175,6 +175,13 @@ const Products = () => {
                     >
                       🛒 Add to Cart
                     </button>
+
+                    <button
+                      className="btn btn-outline-secondary rounded-pill w-100 fw-semibold mt-2"
+                      onClick={() => navigate(`/products/${product.id}`)}
+                    >
+                      View Details
+                    </button>
                   </div>
                 </div>
               </div>
