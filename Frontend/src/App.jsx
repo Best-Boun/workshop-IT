@@ -13,6 +13,7 @@ import InventoryPage from "./pages/admin/InventoryPage";
 import CustomerAnalyticsPage from "./pages/admin/CustomerAnalyticsPage";
 import PaymentPage from "./pages/admin/PaymentPage";
 import ReportsPage from "./pages/admin/ReportsPage";
+import AdminManagementPage from "./pages/admin/AdminManagementPage";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
@@ -43,6 +44,7 @@ function App() {
         <Route path="customers" element={<CustomerAnalyticsPage />} />
         <Route path="payments" element={<PaymentPage />} />
         <Route path="reports" element={<ReportsPage />} />
+        <Route path="admin-management" element={<AdminManagementPage />} />
       </Route>
     </Routes>
   );

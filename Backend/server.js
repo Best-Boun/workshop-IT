@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 import { connectDB } from "./config/db.js";
 import { setupDatabase } from "./utils/setupDatabase.js";
@@ -40,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/admins", adminRoutes);
 
 // Test Route
 app.get("/", async (req, res) => {

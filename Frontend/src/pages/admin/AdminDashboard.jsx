@@ -11,6 +11,7 @@ const sections = [
   { path: "customers", label: "Customer Analytics" },
   { path: "payments", label: "Payment" },
   { path: "reports", label: "Reports & Notifications" },
+  { path: "admin-management", label: "Admin Management" },
 ];
 
 const AdminDashboard = () => {
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
                   }
                 >
                   <span className="nav-link-icon me-2">
-                    <i className={`bi bi-${section.path === "overview" ? "grid-3x3-gap" : section.path === "sales" ? "graph-up" : section.path === "orders" ? "basket3" : section.path === "top-products" ? "star-fill" : section.path === "inventory" ? "inbox-fill" : section.path === "customers" ? "people-fill" : section.path === "payments" ? "receipt-cutoff" : "bell-fill"}`} />
+                    <i className={`bi bi-${section.path === "overview" ? "grid-3x3-gap" : section.path === "sales" ? "graph-up" : section.path === "orders" ? "basket3" : section.path === "top-products" ? "star-fill" : section.path === "inventory" ? "inbox-fill" : section.path === "customers" ? "people-fill" : section.path === "payments" ? "receipt-cutoff" : section.path === "admin-management" ? "person-gear" : "bell-fill"}`} />
                   </span>
                   {section.label}
                 </NavLink>

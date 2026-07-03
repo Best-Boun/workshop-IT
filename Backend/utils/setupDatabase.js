@@ -4,6 +4,38 @@ export const setupDatabase = async () => {
   try {
     console.log("Setting up database tables...");
 
+    // Create users table first because other tables depend on it
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        google_id VARCHAR(255),
+        profile_image VARCHAR(255),
+        role ENUM('user', 'admin', 'superadmin') DEFAULT 'user',
+        permissions TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_role (role)
+      )
+    `);
+
+    console.log("✅ Users table created");
+
+    const [permissionColumn] = await pool.execute(
+      "SHOW COLUMNS FROM users LIKE 'permissions'",
+    );
+
+    if (permissionColumn.length === 0) {
+      await pool.execute(
+        "ALTER TABLE users ADD COLUMN permissions TEXT DEFAULT NULL",
+      );
+      console.log("✅ Users permissions column added");
+    }
+
     // Create orders table
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS orders (
@@ -23,8 +55,6 @@ export const setupDatabase = async () => {
         INDEX idx_created_at (created_at)
       )
     `);
-
-    console.log("✅ Orders table created");
 
     // Create order_items table
     await pool.execute(`

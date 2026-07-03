@@ -28,7 +28,6 @@ const PaymentPage = () => {
         <ul className="list-unstyled mb-0">
           <li>• บัตรเครดิต: 45%</li>
           <li>• Mobile Banking: 30%</li>
-          <li>• Wallet: 15%</li>
           <li>• COD: 10%</li>
         </ul>
       </div>
