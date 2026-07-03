@@ -1,0 +1,42 @@
+.auth-layout {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 65%);
+}
+
+.auth-card {
+  background: #ffffff;
+}
+
+.auth-card .brand-link {
+  color: #1d4ed8;
+}
+
+.auth-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(56, 189, 248, 0.95),
+    rgba(37, 99, 235, 0.95)
+  );
+}
+
+.auth-panel-title {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+}
+
+.feature-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+@media (max-width: 991px) {
+  .auth-layout {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}

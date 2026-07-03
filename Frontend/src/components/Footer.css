@@ -1,0 +1,11 @@
+.site-footer {
+  background: #ffffff;
+}
+
+.site-footer .footer-links li {
+  margin-bottom: 0.5rem;
+}
+
+.site-footer .footer-title {
+  letter-spacing: 0.02em;
+}
