@@ -1,0 +1,172 @@
+/* Cart Page — TechPulse Design */
+.cart-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.cart-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #0ea5e9 100%);
+  padding: 3rem 0 2.5rem;
+  color: #fff;
+}
+
+.cart-hero-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 0.5rem;
+}
+
+.cart-hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.cart-main {
+  padding: 2.5rem 0 4rem;
+}
+
+/* Cart item card */
+.cart-item-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px rgba(15, 23, 42, 0.07);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: box-shadow 0.2s;
+}
+
+.cart-item-card:hover {
+  box-shadow: 0 6px 28px rgba(37, 99, 235, 0.12);
+}
+
+.cart-item-img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #e0f2fe, #bae6fd 72%);
+}
+
+.cart-item-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.cart-item-brand {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.cart-item-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2563eb;
+  white-space: nowrap;
+}
+
+/* Qty controls */
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qty-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid #e2e8f0;
+  background: #f1f5f9;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.qty-btn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.qty-value {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+/* Summary card */
+.cart-summary-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+  padding: 1.75rem;
+  position: sticky;
+  top: 80px;
+}
+
+.summary-heading {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: #475569;
+  padding: 0.35rem 0;
+}
+
+.summary-row.total {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid #f1f5f9;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.empty-cart-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.35;
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.btn-remove:hover {
+  color: #ef4444;
+}

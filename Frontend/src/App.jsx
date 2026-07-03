@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
+<<<<<<< HEAD
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import OverviewPage from "./pages/admin/OverviewPage";
 import SalesAnalyticsPage from "./pages/admin/SalesAnalyticsPage";
@@ -13,6 +14,14 @@ import InventoryPage from "./pages/admin/InventoryPage";
 import CustomerAnalyticsPage from "./pages/admin/CustomerAnalyticsPage";
 import PaymentPage from "./pages/admin/PaymentPage";
 import ReportsPage from "./pages/admin/ReportsPage";
+=======
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
+import OrderHistory from "./pages/OrderHistory";
+import TrackOrder from "./pages/TrackOrder";
+import OrderManagement from "./pages/OrderManagement";
+>>>>>>> 43d2e211dc2d0746b3527a586e13588a756df3ae
 
 function App() {
   return (
@@ -21,6 +30,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/products" element={<Products />} />
+<<<<<<< HEAD
       <Route path="/admin/dashboard" element={<AdminDashboard />}>
         <Route index element={<Navigate to="overview" replace />} />
         <Route path="overview" element={<OverviewPage />} />
@@ -32,6 +42,14 @@ function App() {
         <Route path="payments" element={<PaymentPage />} />
         <Route path="reports" element={<ReportsPage />} />
       </Route>
+=======
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/payment/:orderId" element={<Payment />} />
+      <Route path="/orders" element={<OrderHistory />} />
+      <Route path="/track/:id" element={<TrackOrder />} />
+      <Route path="/admin/orders" element={<OrderManagement />} />
+>>>>>>> 43d2e211dc2d0746b3527a586e13588a756df3ae
     </Routes>
   );
 }
