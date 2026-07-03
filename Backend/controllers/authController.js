@@ -1,4 +1,5 @@
 import AuthService from "../services/authService.js";
+import UserModel from "../models/userModel.js";
 
 class AuthController {
   // ==========================
@@ -54,6 +55,25 @@ class AuthController {
         success: false,
         message: err.message,
       });
+    }
+  }
+
+  // ==========================
+  // GET /api/auth/me
+  // ==========================
+  static async getMe(req, res) {
+    try {
+      const user = await UserModel.findById(req.user.id);
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      const { password: _pw, ...safeUser } = user;
+
+      return res.status(200).json({ success: true, data: safeUser });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: "Server error" });
     }
   }
 }

@@ -20,21 +20,27 @@ import Payment from "./pages/Payment";
 import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
+import { PrivateRoute, AdminRoute } from "./components/PrivateRoute";
 
 function App() {
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/products" element={<Products />} />
       <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/payment/:orderId" element={<Payment />} />
-      <Route path="/orders" element={<OrderHistory />} />
-      <Route path="/track/:id" element={<TrackOrder />} />
-      <Route path="/admin/orders" element={<OrderManagement />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />}>
+
+      {/* Protected routes (login required) */}
+      <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+      <Route path="/payment/:orderId" element={<PrivateRoute><Payment /></PrivateRoute>} />
+      <Route path="/orders" element={<PrivateRoute><OrderHistory /></PrivateRoute>} />
+      <Route path="/track/:id" element={<PrivateRoute><TrackOrder /></PrivateRoute>} />
+
+      {/* Admin routes (admin/superadmin only) */}
+      <Route path="/admin/orders" element={<AdminRoute><OrderManagement /></AdminRoute>} />
+      <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
         <Route index element={<Navigate to="overview" replace />} />
         <Route path="overview" element={<OverviewPage />} />
         <Route path="sales" element={<SalesAnalyticsPage />} />

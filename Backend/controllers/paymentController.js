@@ -36,6 +36,15 @@ class PaymentController {
         });
       }
 
+      // ตรวจสอบว่าชำระเงินแล้วหรือยัง
+      const existingPayment = await PaymentModel.getPaymentByOrderId(order_id);
+      if (existingPayment && existingPayment.status === "completed") {
+        return res.status(400).json({
+          success: false,
+          message: "This order has already been paid",
+        });
+      }
+
       // Simulation: card ending in 0002 → decline (test failure card)
       const lastFour = card_number ? card_number.replace(/\s/g, "").slice(-4) : "1111";
       const isDeclined = lastFour === "0002";

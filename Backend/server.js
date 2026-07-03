@@ -11,6 +11,7 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 import { connectDB } from "./config/db.js";
 import { setupDatabase } from "./utils/setupDatabase.js";
@@ -23,7 +24,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
@@ -41,7 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/api/admins", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Test Route
 app.get("/", async (req, res) => {
@@ -50,6 +56,9 @@ app.get("/", async (req, res) => {
     message: "Backend Running 🚀",
   });
 });
+
+// Global Error Handler (must be after routes)
+app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

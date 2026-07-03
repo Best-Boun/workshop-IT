@@ -1,23 +1,44 @@
+import { useEffect, useState } from "react";
+import api from "../../api/axios";
+
 const PaymentPage = () => {
+  const [stats, setStats] = useState(null);
+  const [methods, setMethods] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      api.get("/admin/stats"),
+      api.get("/admin/payment-methods"),
+    ])
+      .then(([statsRes, methodsRes]) => {
+        setStats(statsRes.data.data.payments);
+        setMethods(methodsRes.data.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totalRevenue = methods.reduce((s, m) => s + Number(m.total_revenue || 0), 0);
+
   return (
     <div>
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <div>
-          <h3>Payment</h3>
-          <p className="text-muted">ติดตามสถานะการชำระเงินและช่องทางที่ลูกค้าใช้</p>
-        </div>
+      <div className="mb-4">
+        <h3>Payments</h3>
+        <p className="text-muted">ภาพรวมการชำระเงินและช่องทางการชำระ</p>
       </div>
 
       <div className="row g-3 mb-4">
         {[
-          { label: "Paid", value: "฿890,400" },
-          { label: "Pending", value: "฿58,700" },
-          { label: "Refunded", value: "฿12,900" },
+          { label: "Total Revenue", value: stats ? `฿${Number(stats.total_revenue || 0).toLocaleString()}` : "…" },
+          { label: "Completed", value: stats?.completed ?? "…" },
+          { label: "Pending", value: stats?.pending ?? "…" },
+          { label: "Refunded/Failed", value: stats ? (Number(stats.refunded||0) + Number(stats.failed||0)) : "…" },
         ].map((item) => (
-          <div key={item.label} className="col-12 col-sm-4">
+          <div key={item.label} className="col-12 col-sm-6 col-lg-3">
             <div className="admin-summary-card p-4 rounded shadow-sm h-100">
               <div className="text-uppercase text-secondary mb-2">{item.label}</div>
-              <div className="display-6 fw-bold">{item.value}</div>
+              <div className="display-6 fw-bold">{loading ? "…" : item.value}</div>
             </div>
           </div>
         ))}

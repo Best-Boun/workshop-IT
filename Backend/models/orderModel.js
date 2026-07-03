@@ -39,6 +39,12 @@ class OrderModel {
            VALUES (?, ?, ?, ?)`,
           [orderId, item.product_id, item.quantity, item.price],
         );
+
+        // หักสต็อกสินค้า
+        await conn.execute(
+          `UPDATE products SET stock = GREATEST(stock - ?, 0) WHERE id = ?`,
+          [item.quantity, item.product_id],
+        );
       }
 
       await conn.commit();

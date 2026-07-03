@@ -1,5 +1,6 @@
 import express from "express";
 import AuthController from "../controllers/authController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 import {
   registerValidation,
   loginValidation,
@@ -24,6 +25,10 @@ router.post(
   AuthController.login,
 );
 
+// Google Login
 router.post("/google", AuthController.googleLogin);
+
+// Get current user (protected)
+router.get("/me", authMiddleware, AuthController.getMe);
 
 export default router;

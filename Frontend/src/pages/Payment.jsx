@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
@@ -16,7 +16,16 @@ const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const total = location.state?.total || 0;
+  // ถ้าไม่มี state จาก checkout ให้ fetch order มาเอา total จริง
+  const [total, setTotal] = useState(location.state?.total || null);
+
+  useEffect(() => {
+    if (total === null) {
+      api.get(`/orders/${orderId}`)
+        .then((res) => setTotal(Number(res.data.data.total_amount)))
+        .catch(() => setTotal(0));
+    }
+  }, [orderId, total]);
 
   const [method, setMethod] = useState("credit_card");
   const [card, setCard] = useState({
@@ -61,6 +70,19 @@ const Payment = () => {
       setLoading(false);
     }
   };
+
+  // ─── Loading total ───
+  if (total === null) {
+    return (
+      <div className="payment-page">
+        <Navbar />
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
+          <div className="spinner-border text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   // ─── Result Screen ───
   if (result) {
