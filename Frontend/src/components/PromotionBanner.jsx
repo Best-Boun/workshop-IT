@@ -4,7 +4,7 @@ const PromotionBanner = () => {
   return (
     <section className="promotion-banner py-5 position-relative overflow-hidden">
       <div className="container">
-        <div className="row align-items-center justify-content-between">
+        <div className="row align-items-center justify-content-between promotion-banner-row">
           <div className="col-lg-7">
             <p className="text-uppercase text-white mb-2 small fw-semibold">
               Limited time offer
@@ -12,15 +12,20 @@ const PromotionBanner = () => {
             <h2 className="display-6 fw-bold text-white mb-3">
               Save up to 20% on the latest GPU and CPU bundles
             </h2>
-            <p className="text-white-75 mb-4">
+            <p className="text-white-75 mb-3 promotion-banner-copy">
               Shop the premium hardware sale and upgrade your rig with fast
               shipping and expert service.
             </p>
+
+            <h3 className="promotion-banner-cta mb-4">
+              Upgrade Your Setup Today
+            </h3>
+
             <a
               className="btn btn-light btn-lg text-primary rounded-pill"
               href="#products"
             >
-              Explore deals
+              Shop Now
             </a>
           </div>
           <div className="col-lg-4 d-none d-lg-block text-end">

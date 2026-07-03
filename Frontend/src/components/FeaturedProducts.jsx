@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./FeaturedProducts.css";
 
 const featuredProducts = [
@@ -29,14 +30,25 @@ const featuredProducts = [
 
 const FeaturedProducts = () => {
   return (
-    <section className="py-5 bg-light" id="featured-products">
+    <section className="featured-products-section py-5 bg-light" id="featured-products">
       <div className="container">
-        <div className="mb-4 text-center">
-          <p className="text-uppercase text-primary mb-2 small fw-semibold">
-            Featured products
-          </p>
-          <h2 className="fw-bold">Top picks for your next build</h2>
+        <div className="featured-products-header mb-4 mb-lg-5">
+          <div className="featured-products-heading">
+            <p className="text-uppercase text-primary mb-2 small fw-semibold">
+              Featured products
+            </p>
+            <h2 className="fw-bold mb-2">Top picks for your next build</h2>
+            <p className="featured-products-subtitle mb-0">
+              Explore standout components chosen for performance, reliability,
+              and everyday upgrade value.
+            </p>
+          </div>
+
+          <Link to="/products" className="btn btn-outline-primary rounded-pill px-4 featured-products-action">
+            View All
+          </Link>
         </div>
+
         <div className="row g-4">
           {featuredProducts.map((product) => (
             <div key={product.name} className="col-md-6 col-xl-4">

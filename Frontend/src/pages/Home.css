@@ -2,14 +2,113 @@
   background: #f8fafc;
 }
 
-.home-page main {
+.home-main {
   overflow: hidden;
+  padding-bottom: 3rem;
 }
 
 .home-page section {
   position: relative;
 }
 
-.home-page section + section {
-  margin-top: 2rem;
+.home-section-shell {
+  position: relative;
+}
+
+.home-section-shell--primary {
+  margin-top: -2rem;
+  z-index: 2;
+}
+
+.home-section-shell--featured,
+.home-section-shell--standard,
+.home-section-shell--promo,
+.home-section-shell--trust {
+  margin-top: 1.5rem;
+}
+
+.home-section-shell--featured::before,
+.home-section-shell--standard::before,
+.home-section-shell--promo::before,
+.home-section-shell--trust::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 1120px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0),
+    rgba(148, 163, 184, 0.38),
+    rgba(148, 163, 184, 0)
+  );
+}
+
+.home-section-shell--featured {
+  padding-top: 1.25rem;
+}
+
+.home-section-shell--featured section,
+.home-section-shell--trust section {
+  background: transparent !important;
+}
+
+.home-section-shell--standard,
+.home-section-shell--trust {
+  padding-top: 0.75rem;
+}
+
+.home-section-shell--promo {
+  padding-top: 0.75rem;
+}
+
+.home-section-shell--primary .container,
+.home-section-shell--featured .container,
+.home-section-shell--standard .container,
+.home-section-shell--promo .container,
+.home-section-shell--trust .container {
+  position: relative;
+}
+
+@media (max-width: 991px) {
+  .home-main {
+    padding-bottom: 2rem;
+  }
+
+  .home-section-shell--primary {
+    margin-top: -0.75rem;
+  }
+
+  .home-section-shell--featured,
+  .home-section-shell--standard,
+  .home-section-shell--promo,
+  .home-section-shell--trust {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .home-main {
+    padding-bottom: 1.5rem;
+  }
+
+  .home-section-shell--primary {
+    margin-top: -0.25rem;
+  }
+
+  .home-section-shell--featured,
+  .home-section-shell--standard,
+  .home-section-shell--promo,
+  .home-section-shell--trust {
+    margin-top: 0.75rem;
+  }
+
+  .home-section-shell--featured::before,
+  .home-section-shell--standard::before,
+  .home-section-shell--promo::before,
+  .home-section-shell--trust::before {
+    width: calc(100% - 2rem);
+  }
 }

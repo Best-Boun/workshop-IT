@@ -1,0 +1,83 @@
+.popular-brands-subtitle {
+  max-width: 42rem;
+  color: #64748b;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.brand-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  min-height: 132px;
+}
+
+.brand-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 132px;
+  padding: 1.25rem;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #0f172a;
+}
+
+.brand-asus {
+  font-size: 1.6rem;
+  color: #1d4ed8;
+}
+
+.brand-msi {
+  font-size: 1.7rem;
+  color: #dc2626;
+}
+
+.brand-lenovo {
+  font-size: 1.4rem;
+  color: #1e293b;
+}
+
+.brand-dell {
+  font-size: 1.6rem;
+  color: #0ea5e9;
+}
+
+.brand-hp {
+  font-size: 1.9rem;
+  color: #2563eb;
+}
+
+.brand-acer {
+  font-size: 1.6rem;
+  color: #16a34a;
+}
+
+@media (max-width: 575px) {
+  .brand-card,
+  .brand-logo {
+    min-height: 108px;
+  }
+
+  .brand-asus,
+  .brand-msi,
+  .brand-lenovo,
+  .brand-dell,
+  .brand-hp,
+  .brand-acer {
+    font-size: 1.25rem;
+  }
+}

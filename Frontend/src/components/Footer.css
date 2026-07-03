@@ -1,11 +1,71 @@
 .site-footer {
   background: #ffffff;
+  padding-top: 4rem !important;
+  padding-bottom: 3rem !important;
+}
+
+.site-footer .footer-grid {
+  align-items: start;
+}
+
+.site-footer .footer-brand {
+  color: #0f172a;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.site-footer .footer-brand-copy {
+  max-width: 22rem;
+  line-height: 1.8;
 }
 
 .site-footer .footer-links li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.6;
 }
 
 .site-footer .footer-title {
-  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  color: #0f172a;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-footer .footer-contact p {
+  line-height: 1.7;
+}
+
+.site-footer .footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.site-footer .footer-social-link:hover {
+  color: #2563eb !important;
+  transform: translateX(4px);
+}
+
+.site-footer .footer-bottom {
+  margin-top: 2rem !important;
+  padding-top: 1.5rem !important;
+}
+
+@media (max-width: 767px) {
+  .site-footer {
+    padding-top: 3rem !important;
+    padding-bottom: 2.25rem !important;
+  }
+
+  .site-footer .footer-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .site-footer .footer-brand-copy {
+    max-width: none;
+  }
 }

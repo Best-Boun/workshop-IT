@@ -179,7 +179,7 @@ const Navbar = () => {
             <li className="nav-item me-3">
               <Link
                 to="/cart"
-                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-2"
+                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 js-cart-target"
               >
                 🛒 Cart
               </Link>

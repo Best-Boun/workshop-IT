@@ -4,6 +4,10 @@
   overflow: hidden;
 }
 
+.promotion-banner-row {
+  min-height: 320px;
+}
+
 .promotion-banner::before {
   content: "";
   position: absolute;
@@ -19,7 +23,26 @@
   min-width: 170px;
 }
 
+.promotion-banner-copy {
+  max-width: 34rem;
+  line-height: 1.75;
+}
+
+.promotion-banner-cta {
+  color: #fff;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .promotion-pill {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 991px) {
+  .promotion-banner-row {
+    min-height: auto;
+    gap: 1rem;
+  }
 }

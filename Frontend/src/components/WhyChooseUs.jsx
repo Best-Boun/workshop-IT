@@ -23,7 +23,7 @@ const WhyChooseUs = () => {
   return (
     <section className="why-choose-section py-5 bg-light">
       <div className="container">
-        <div className="text-center mb-4">
+        <div className="why-choose-header text-center mb-4 mb-lg-5">
           <p className="text-uppercase text-primary mb-2 small fw-semibold">
             Why choose us
           </p>
@@ -32,11 +32,11 @@ const WhyChooseUs = () => {
           </h2>
         </div>
 
-        <div className="row g-3">
+        <div className="row g-3 g-lg-4 why-choose-grid">
           {features.map((feature) => (
             <div key={feature.title} className="col-md-6 col-xl-3">
               <div className="card why-choose-card border-0 rounded-4 shadow-sm h-100 p-4 text-center">
-                <div className="mb-3">
+                <div className="mb-3 why-choose-icon-wrap">
                   <span className="badge bg-primary bg-opacity-10 text-primary py-2 px-3 rounded-pill feature-badge">
                     ✓
                   </span>
