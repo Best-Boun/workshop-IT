@@ -14,6 +14,8 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState(null);
+  const [cartQty, setCartQty] = useState(0);
+  const [stockNotice, setStockNotice] = useState("");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -38,10 +40,20 @@ const ProductDetail = () => {
   }, [id]);
 
   const stock = Number(product?.stock || 0);
+  const isCartAtMax = stock > 0 && cartQty >= stock;
   const safeQty = useMemo(() => {
     if (stock <= 0) return 1;
     return Math.min(Math.max(quantity, 1), stock);
   }, [quantity, stock]);
+
+  useEffect(() => {
+    if (!product) return;
+
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existing = cart.find((item) => Number(item.id) === Number(product.id));
+    const existingQty = existing ? Number(existing.quantity) || 0 : 0;
+    setCartQty(existingQty);
+  }, [product]);
 
   useEffect(() => {
     if (quantity !== safeQty) {
@@ -81,9 +93,17 @@ const ProductDetail = () => {
 
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const existing = cart.find((item) => item.id === product.id);
+    const existingQty = existing ? Number(existing.quantity) || 0 : 0;
+
+    if (existingQty >= stock) {
+      setStockNotice(`Only ${stock} items available.`);
+      return;
+    }
+
+    const requestedQty = Math.min(safeQty, stock - existingQty);
 
     if (existing) {
-      existing.quantity += safeQty;
+      existing.quantity += requestedQty;
     } else {
       cart.push({
         id: product.id,
@@ -91,11 +111,13 @@ const ProductDetail = () => {
         brand: product.brand,
         price: product.price,
         image: product.image,
-        quantity: safeQty,
+        quantity: requestedQty,
       });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
+    setCartQty(existingQty + requestedQty);
+    setStockNotice("");
     setToast(product.name);
     setTimeout(() => setToast(null), 2200);
   };
@@ -213,7 +235,7 @@ const ProductDetail = () => {
                         onChange={handleQtyInput}
                         disabled={stock <= 0}
                       />
-                      <button className="qty-btn" onClick={increaseQty} disabled={stock <= 0}>
+                      <button className="qty-btn" onClick={increaseQty} disabled={stock <= 0 || safeQty >= stock}>
                         +
                       </button>
                     </div>
@@ -221,7 +243,7 @@ const ProductDetail = () => {
                     <button
                       className="btn btn-primary rounded-pill px-4 fw-semibold"
                       onClick={addToCart}
-                      disabled={stock <= 0}
+                      disabled={stock <= 0 || isCartAtMax}
                     >
                       🛒 Add To Cart
                     </button>
@@ -234,6 +256,12 @@ const ProductDetail = () => {
                       Buy Now
                     </button>
                   </div>
+
+                  {(isCartAtMax || stockNotice) && (
+                    <p className="small text-warning fw-semibold mb-0 mt-3" aria-live="polite">
+                      {isCartAtMax ? "Maximum stock reached" : stockNotice}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -16,6 +16,9 @@ router.get("/categories/all", ProductController.getCategories);
 // ดึงสินค้าตามหมวด
 router.get("/category/:id", ProductController.getProductsByCategory);
 
+// ดึงสินค้าที่ใกล้หมด
+router.get("/low-stock", ProductController.getLowStockProducts);
+
 // ดึงรายละเอียดสินค้า
 router.get("/:id", ProductController.getProductById);
 

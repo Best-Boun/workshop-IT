@@ -20,6 +20,30 @@ class ReportController {
     }
   }
 
+  // GET /api/reports/chart
+  static async getRevenueChart(req, res) {
+    try {
+      const { range = "1m", month, year } = req.query;
+      const analytics = await ReportModel.getRevenueChart({
+        range,
+        month,
+        year,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: analytics,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch revenue chart report",
+      });
+    }
+  }
+
   // GET /api/reports/sales
   static async getMonthlySales(req, res) {
     try {

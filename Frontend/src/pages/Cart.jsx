@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/Cart.css";
@@ -7,11 +8,38 @@ import "../css/Cart.css";
 const Cart = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
+  const [stockMap, setStockMap] = useState({});
+  const [stockMessageById, setStockMessageById] = useState({});
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
+
+  useEffect(() => {
+    const fetchStocks = async () => {
+      if (cart.length === 0) {
+        setStockMap({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        cart.map(async (item) => {
+          try {
+            const res = await api.get(`/products/${item.id}`);
+            const stock = Math.max(0, Number(res.data?.data?.stock) || 0);
+            return [item.id, stock];
+          } catch {
+            return [item.id, null];
+          }
+        }),
+      );
+
+      setStockMap(Object.fromEntries(entries));
+    };
+
+    fetchStocks();
+  }, [cart]);
 
   const saveCart = (updated) => {
     setCart(updated);
@@ -19,6 +47,28 @@ const Cart = () => {
   };
 
   const updateQty = (id, delta) => {
+    const stock = stockMap[id];
+
+    if (delta > 0 && Number.isFinite(stock)) {
+      const item = cart.find((entry) => entry.id === id);
+      const currentQty = item ? Number(item.quantity) || 0 : 0;
+
+      if (currentQty >= stock) {
+        setStockMessageById((prev) => ({
+          ...prev,
+          [id]: stock > 0 ? `Only ${stock} items available.` : "Maximum stock reached",
+        }));
+        return;
+      }
+    }
+
+    setStockMessageById((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+
     const updated = cart
       .map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + delta } : item,
@@ -75,6 +125,12 @@ const Cart = () => {
                 </p>
 
                 {cart.map((item) => (
+                  (() => {
+                    const stock = stockMap[item.id];
+                    const currentQty = Number(item.quantity) || 0;
+                    const isMax = Number.isFinite(stock) && currentQty >= stock;
+
+                    return (
                   <div className="cart-item-card" key={item.id}>
                     <img
                       src={
@@ -111,15 +167,24 @@ const Cart = () => {
                       <button
                         className="qty-btn"
                         onClick={() => updateQty(item.id, +1)}
+                        disabled={isMax}
                       >
                         +
                       </button>
                     </div>
 
+                    {(isMax || stockMessageById[item.id]) && (
+                      <div className="small text-warning fw-semibold mt-1" style={{ minWidth: 150 }}>
+                        {isMax ? "Maximum stock reached" : stockMessageById[item.id]}
+                      </div>
+                    )}
+
                     <div className="cart-item-price">
                       ฿{(item.price * item.quantity).toLocaleString()}
                     </div>
                   </div>
+                    );
+                  })()
                 ))}
               </div>
 

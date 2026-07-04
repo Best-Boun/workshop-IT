@@ -6,6 +6,9 @@ const router = express.Router();
 // ดึงสรุปรายงานแผงควบคุม
 router.get("/dashboard", ReportController.getDashboardSummary);
 
+// ดึงรายงานกราฟรายได้ตามช่วงเวลา
+router.get("/chart", ReportController.getRevenueChart);
+
 // ดึงรายงานยอดขายตามเดือน
 router.get("/sales", ReportController.getMonthlySales);
 

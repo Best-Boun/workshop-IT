@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import AppError from "../utils/AppError.js";
 
 class OrderModel {
   // สร้าง order พร้อม items (transaction)
@@ -35,23 +36,49 @@ class OrderModel {
       const orderId = orderResult.insertId;
 
       for (const item of items) {
+        const requestedQty = Number(item.quantity) || 0;
+
+        if (requestedQty <= 0) {
+          throw new AppError("Invalid item quantity", 400);
+        }
+
+        const [productRows] = await conn.execute(
+          `SELECT id, name, stock
+           FROM products
+           WHERE id = ?
+           FOR UPDATE`,
+          [item.product_id],
+        );
+
+        const product = productRows[0];
+        if (!product) {
+          throw new AppError(`Product ${item.product_id} not found`, 404);
+        }
+
+        if (requestedQty > Number(product.stock || 0)) {
+          throw new AppError(
+            `Only ${product.stock} items available for ${product.name}`,
+            409,
+          );
+        }
+
         await conn.execute(
           `INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
            VALUES (?, ?, ?, ?, ?)`,
           [
             orderId,
             item.product_id,
-            item.quantity,
+            requestedQty,
             item.price,
-            item.quantity * item.price,
+            requestedQty * item.price,
           ],
         );
 
         await conn.execute(
           `UPDATE products
-           SET stock = GREATEST(stock - ?, 0)
+           SET stock = stock - ?
            WHERE id = ?`,
-          [item.quantity, item.product_id],
+          [requestedQty, item.product_id],
         );
       }
 
@@ -69,15 +96,17 @@ class OrderModel {
   static async getOrderById(orderId) {
     const [rows] = await pool.query(
       `SELECT
-          o.*,
-          o.total_price AS total_amount,
-          u.first_name,
-          u.last_name,
-          u.email
-       FROM orders o
-       JOIN users u
-         ON o.user_id = u.id
-       WHERE o.id = ?`,
+        o.*,
+        o.total_price AS total_amount,
+        CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
+        u.email AS customer_email,
+        u.first_name,
+        u.last_name,
+        u.email
+     FROM orders o
+     JOIN users u
+       ON o.user_id = u.id
+     WHERE o.id = ?`,
       [orderId],
     );
 
@@ -87,14 +116,14 @@ class OrderModel {
 
     const [items] = await pool.query(
       `SELECT
-          oi.*,
-          p.name,
-          p.image,
-          p.brand
-       FROM order_items oi
-       JOIN products p
-         ON oi.product_id = p.id
-       WHERE oi.order_id = ?`,
+        oi.*,
+        p.name AS product_name,
+        p.image AS product_image,
+        p.brand
+     FROM order_items oi
+     JOIN products p
+       ON oi.product_id = p.id
+     WHERE oi.order_id = ?`,
       [orderId],
     );
 
@@ -132,19 +161,24 @@ class OrderModel {
   static async getAllOrders() {
     const [rows] = await pool.query(
       `SELECT
-          o.*,
-          o.total_price AS total_amount,
-          u.first_name,
-          u.last_name,
-          u.email,
-          COUNT(oi.id) AS item_count
-       FROM orders o
-       JOIN users u
-         ON o.user_id = u.id
-       LEFT JOIN order_items oi
-         ON o.id = oi.order_id
-       GROUP BY o.id
-       ORDER BY o.created_at DESC`,
+        o.*,
+        o.total_price AS total_amount,
+        CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
+        u.first_name,
+        u.last_name,
+        u.email,
+        COUNT(oi.id) AS item_count
+     FROM orders o
+     JOIN users u
+       ON o.user_id = u.id
+     LEFT JOIN order_items oi
+       ON o.id = oi.order_id
+     GROUP BY
+       o.id,
+       u.first_name,
+       u.last_name,
+       u.email
+     ORDER BY o.created_at DESC`,
     );
 
     return rows;

@@ -1,37 +1,37 @@
 import "./Dashboard.css";
 
-const cards = [
-  {
-    title: "Products",
-    value: "152",
-    change: "+12%",
-    icon: "bi-box-seam",
-    color: "primary",
-  },
-  {
-    title: "Orders",
-    value: "35",
-    change: "+8%",
-    icon: "bi-cart-check",
-    color: "success",
-  },
-  {
-    title: "Customers",
-    value: "89",
-    change: "+20%",
-    icon: "bi-people",
-    color: "warning",
-  },
-  {
-    title: "Revenue",
-    value: "฿520,000",
-    change: "+18%",
-    icon: "bi-cash-stack",
-    color: "danger",
-  },
-];
+const StatsCards = ({ summary, loading }) => {
+  const cards = [
+    {
+      title: "Products",
+      value: summary?.total_products ?? 0,
+      icon: "bi-box-seam",
+      color: "primary",
+      meta: "Inventory overview",
+    },
+    {
+      title: "Orders",
+      value: summary?.total_orders ?? 0,
+      icon: "bi-cart-check",
+      color: "success",
+      meta: "All transactions",
+    },
+    {
+      title: "Customers",
+      value: summary?.total_customers ?? 0,
+      icon: "bi-people",
+      color: "warning",
+      meta: "Registered users",
+    },
+    {
+      title: "Today Revenue",
+      value: `฿${Number(summary?.today_revenue || 0).toLocaleString()}`,
+      icon: "bi-cash-stack",
+      color: "danger",
+      meta: `${Number(summary?.today_growth_percentage || 0).toFixed(1)}% vs yesterday`,
+    },
+  ];
 
-const StatsCards = () => {
   return (
     <div className="row g-4">
       {cards.map((card) => (
@@ -44,9 +44,9 @@ const StatsCards = () => {
             <div className="card-info">
               <p>{card.title}</p>
 
-              <h3>{card.value}</h3>
+              <h3>{loading ? "—" : card.value}</h3>
 
-              <small>{card.change} from last month</small>
+              <small>{loading ? "Syncing..." : card.meta}</small>
             </div>
           </div>
         </div>

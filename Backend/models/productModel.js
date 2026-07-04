@@ -302,6 +302,25 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
     return result;
   }
+
+  // ดึงสินค้าที่ใกล้หมด
+  static async getLowStockProducts() {
+    const [rows] = await pool.query(`
+    SELECT
+      id,
+      sku,
+      name,
+      brand,
+      stock,
+      image
+    FROM products
+    WHERE stock <= 10
+      AND status = 'active'
+    ORDER BY stock ASC, name ASC
+  `);
+
+    return rows;
+  }
 }
 
  

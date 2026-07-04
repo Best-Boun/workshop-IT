@@ -13,6 +13,24 @@ import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
 
 import { PrivateRoute, AdminRoute, AdminPageRoute } from "./components/PrivateRoute";
+import {
+  PrivateRoute,
+  AdminRoute,
+  SuperAdminRoute,
+} from "./components/PrivateRoute";
+import ScrollToTop from "./components/ScrollToTop";
+
+// ===== เพื่อน =====
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import OverviewPage from "./pages/admin/OverviewPage";
+import SalesAnalyticsPage from "./pages/admin/SalesAnalyticsPage";
+import OrderManagementPage from "./pages/admin/OrderManagementPage";
+import TopProductsPage from "./pages/admin/TopProductsPage";
+import InventoryPage from "./pages/admin/InventoryPage";
+import CustomerAnalyticsPage from "./pages/admin/CustomerAnalyticsPage";
+import PaymentPage from "./pages/admin/PaymentPage";
+import ReportsPage from "./pages/admin/ReportsPage";
+import AdminManagementPage from "./pages/admin/AdminManagementPage";
 
 // ===== ของมึง =====
 import AdminLayout from "./layouts/AdminLayout";
@@ -38,199 +56,115 @@ import AdminManagementPage from "./pages/admin/AdminManagementPage";
 
 function App() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/:id" element={<ProductDetail />} />
-      <Route path="/cart" element={<Cart />} />
+    <>
+      <ScrollToTop />
 
-      {/* User */}
-      <Route
-        path="/checkout"
-        element={
-          <PrivateRoute>
-            <Checkout />
-          </PrivateRoute>
-        }
-      />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
 
-      <Route
-        path="/payment/:orderId"
-        element={
-          <PrivateRoute>
-            <Payment />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/orders"
-        element={
-          <PrivateRoute>
-            <OrderHistory />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/track/:id"
-        element={
-          <PrivateRoute>
-            <TrackOrder />
-          </PrivateRoute>
-        }
-      />
-
-      {/* Admin CRUD ของมึง */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
+        {/* User */}
         <Route
-          path="dashboard"
+          path="/checkout"
           element={
-            <AdminPageRoute pageKey="dashboard">
-              <Dashboard />
-            </AdminPageRoute>
+            <PrivateRoute>
+              <Checkout />
+            </PrivateRoute>
           }
         />
 
         <Route
-          path="products"
+          path="/payment/:orderId"
           element={
-            <AdminPageRoute pageKey="products">
-              <ProductsAdmin />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="products/add"
-          element={
-            <AdminPageRoute pageKey="products" mode="manage">
-              <AddProduct />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="products/edit/:id"
-          element={
-            <AdminPageRoute pageKey="products" mode="manage">
-              <EditProduct />
-            </AdminPageRoute>
+            <PrivateRoute>
+              <Payment />
+            </PrivateRoute>
           }
         />
 
         <Route
-          path="categories"
+          path="/orders"
           element={
-            <AdminPageRoute pageKey="categories">
-              <Categories />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="categories/add"
-          element={
-            <AdminPageRoute pageKey="categories" mode="manage">
-              <AddCategory />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="categories/edit/:id"
-          element={
-            <AdminPageRoute pageKey="categories" mode="manage">
-              <EditCategory />
-            </AdminPageRoute>
+            <PrivateRoute>
+              <OrderHistory />
+            </PrivateRoute>
           }
         />
 
         <Route
-          path="orders"
+          path="/track/:id"
           element={
-            <AdminPageRoute pageKey="orders">
-              <Orders />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="orders/:id"
-          element={
-            <AdminPageRoute pageKey="orders">
-              <OrderDetail />
-            </AdminPageRoute>
+            <PrivateRoute>
+              <TrackOrder />
+            </PrivateRoute>
           }
         />
 
+        {/* Admin CRUD ของมึง */}
         <Route
-          path="customers"
+          path="/admin"
           element={
-            <AdminPageRoute pageKey="customers">
-              <Customers />
-            </AdminPageRoute>
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
           }
-        />
-        <Route
-          path="customers/:id"
-          element={
-            <AdminPageRoute pageKey="customers">
-              <CustomerDetail />
-            </AdminPageRoute>
-          }
-        />
+        >
+          <Route path="dashboard" element={<Dashboard />} />
 
-        <Route
-          path="reports"
-          element={
-            <AdminPageRoute pageKey="reports">
-              <Reports />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="admin-management"
-          element={
-            <AdminPageRoute pageKey="adminManagement">
-              <AdminManagementPage />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="reports/admin-management"
-          element={
-            <AdminPageRoute pageKey="adminManagement">
-              <AdminManagementPage />
-            </AdminPageRoute>
-          }
-        />
-        <Route
-          path="logs-security"
-          element={
-            <AdminPageRoute pageKey="logsSecurity">
-              <LogSecurityPage />
-            </AdminPageRoute>
-          }
-        />
-      </Route>
+          <Route path="products" element={<ProductsAdmin />} />
+          <Route path="products/add" element={<AddProduct />} />
+          <Route path="products/edit/:id" element={<EditProduct />} />
 
-      {/* Legacy super-admin routes removed; all admin access now uses /admin */}
-      {/* Route เดิมของเพื่อน */}
-      <Route
-        path="/admin/orders"
-        element={
-          <AdminRoute>
-            <OrderManagement />
-          </AdminRoute>
-        }
-      />
-    </Routes>
+          <Route path="categories" element={<Categories />} />
+          <Route path="categories/add" element={<AddCategory />} />
+          <Route path="categories/edit/:id" element={<EditCategory />} />
+
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
+
+          <Route path="customers" element={<Customers />} />
+          <Route path="customers/:id" element={<CustomerDetail />} />
+
+          <Route path="reports" element={<Reports />} />
+        </Route>
+
+        {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
+        <Route
+          path="/superadmin"
+          element={
+            <SuperAdminRoute>
+              <AdminDashboard />
+            </SuperAdminRoute>
+          }
+        >
+          <Route index element={<OverviewPage />} />
+          <Route path="overview" element={<OverviewPage />} />
+          <Route path="sales" element={<SalesAnalyticsPage />} />
+          <Route path="orders" element={<OrderManagementPage />} />
+          <Route path="top-products" element={<TopProductsPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="customers" element={<CustomerAnalyticsPage />} />
+          <Route path="payments" element={<PaymentPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="admin-management" element={<AdminManagementPage />} />
+        </Route>
+
+        {/* Route เดิมของเพื่อน */}
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminRoute>
+              <OrderManagement />
+            </AdminRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

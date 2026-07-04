@@ -190,6 +190,26 @@ class ProductController {
       });
     }
   }
+
+  // GET /api/products/low-stock
+  static async getLowStockProducts(req, res) {
+    try {
+      const products = await ProductModel.getLowStockProducts();
+
+      res.status(200).json({
+        success: true,
+        count: products.length,
+        data: products,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch low stock products",
+      });
+    }
+  }
 }
 
 
