@@ -143,6 +143,166 @@ class ProductModel {
 
     return rows;
   }
+
+  // เพิ่มสินค้า
+  static async createProduct(product) {
+    const {
+      category_id,
+      sku,
+      name,
+      brand,
+      description,
+      price,
+      stock,
+      cpu,
+      gpu,
+      ram,
+      storage,
+      display,
+      warranty,
+      warranty_provider,
+      image,
+      featured,
+      status,
+    } = product;
+
+    const [result] = await pool.query(
+      `
+      INSERT INTO products
+(
+  category_id,
+  sku,
+  name,
+  brand,
+  description,
+  price,
+  stock,
+  cpu,
+  gpu,
+  ram,
+  storage,
+  display,
+  warranty,
+  warranty_provider,
+  image,
+  featured,
+  status
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        category_id,
+        sku,
+        name,
+        brand,
+        description,
+        price,
+        stock,
+        cpu,
+        gpu,
+        ram,
+        storage,
+        display,
+        warranty,
+        warranty_provider,
+        image,
+        featured,
+        status,
+      ],
+    );
+
+    return {
+      id: result.insertId,
+      ...product,
+    };
+  }
+
+  // แก้ไขสินค้า
+  static async updateProduct(id, product) {
+    const {
+      category_id,
+      sku,
+      name,
+      brand,
+      description,
+      price,
+      stock,
+      cpu,
+      gpu,
+      ram,
+      storage,
+      display,
+      warranty,
+      warranty_provider,
+      image,
+      featured,
+      status,
+    } = product;
+
+    await pool.query(
+      `
+      UPDATE products
+      SET
+        category_id = ?,
+        sku = ?,
+        name = ?,
+        brand = ?,
+        description = ?,
+        price = ?,
+        stock = ?,
+        cpu = ?,
+        gpu = ?,
+        ram = ?,
+        storage = ?,
+        display = ?,
+        warranty = ?,
+        warranty_provider = ?,
+        image = ?,
+        featured = ?,
+        status = ?
+      WHERE id = ?
+      `,
+      [
+        category_id,
+        sku,
+        name,
+        brand,
+        description,
+        price,
+        stock,
+        cpu,
+        gpu,
+        ram,
+        storage,
+        display,
+        warranty,
+        warranty_provider,
+        image,
+        featured,
+        status,
+        id,
+      ],
+    );
+
+    return {
+      id,
+      ...product,
+    };
+  }
+
+  // ลบสินค้า
+  static async deleteProduct(id) {
+    const [result] = await pool.query(
+      `
+    DELETE FROM products
+    WHERE id = ?
+    `,
+      [id],
+    );
+
+    return result;
+  }
 }
 
+ 
 export default ProductModel;

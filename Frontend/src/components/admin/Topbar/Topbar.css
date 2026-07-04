@@ -1,0 +1,116 @@
+.admin-topbar {
+  height: 80px;
+  background: var(--card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.topbar-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.topbar-search {
+  width: 320px;
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.topbar-search:focus-within {
+  border-color: var(--primary);
+  background: var(--card);
+}
+
+.topbar-search i {
+  color: var(--text-secondary);
+}
+
+.topbar-search input {
+  width: 100%;
+  margin-left: 10px;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.topbar-search input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* ---------- Topbar Buttons ---------- */
+
+.topbar-icon-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: var(--input-bg);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+
+.topbar-icon-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.topbar-icon-btn i {
+  font-size: 18px;
+}
+
+/* ---------- Profile ---------- */
+
+.topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.profile-avatar {
+  width: 46px;
+  height: 46px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.topbar-profile small {
+  color: var(--text-secondary);
+  display: block;
+}

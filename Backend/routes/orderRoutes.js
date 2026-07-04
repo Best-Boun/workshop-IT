@@ -5,22 +5,39 @@ import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-// POST   /api/orders           →  Checkout (create order)
+// ================= USER =================
+
+// Checkout
 router.post("/", authMiddleware, OrderController.createOrder);
 
-// GET    /api/orders/my        →  Order history (user's own orders)
+// Order History
 router.get("/my", authMiddleware, OrderController.getMyOrders);
 
-// GET    /api/orders           →  All orders (admin only)
-router.get("/", authMiddleware, adminMiddleware, OrderController.getAllOrders);
-
-// GET    /api/orders/:id       →  Track order
+// Track Order
 router.get("/:id", authMiddleware, OrderController.getOrderById);
 
-// PUT    /api/orders/:id/status →  Update order status (admin only)
-router.put("/:id/status", authMiddleware, adminMiddleware, OrderController.updateOrderStatus);
-
-// PUT    /api/orders/:id/cancel →  Cancel order (user)
+// Cancel Order
 router.put("/:id/cancel", authMiddleware, OrderController.cancelOrder);
+
+// ================= ADMIN =================
+
+// All Orders
+router.get("/", authMiddleware, adminMiddleware, OrderController.getAllOrders);
+
+// Update Status
+router.put(
+  "/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  OrderController.updateOrderStatus,
+);
+
+// Delete Order
+router.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  OrderController.deleteOrder,
+);
 
 export default router;

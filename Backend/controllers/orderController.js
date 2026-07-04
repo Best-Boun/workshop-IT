@@ -86,7 +86,6 @@ class OrderController {
           .json({ success: false, message: "Order not found" });
       }
 
-      // ต้องเป็น owner หรือ admin
       if (order.user_id !== req.user.id && req.user.role !== "admin") {
         return res.status(403).json({ success: false, message: "Forbidden" });
       }
@@ -145,11 +144,12 @@ class OrderController {
           .json({ success: false, message: "Invalid status value" });
       }
 
-      await OrderModel.updateOrderStatus(id, status);
+      const result = await OrderModel.updateOrderStatus(id, status);
 
       return res.status(200).json({
         success: true,
         message: "Order status updated",
+        data: result,
       });
     } catch (error) {
       console.error("updateOrderStatus error:", error);
@@ -195,6 +195,27 @@ class OrderController {
       return res
         .status(500)
         .json({ success: false, message: "Failed to cancel order" });
+    }
+  }
+
+  // ==========================
+  // DELETE /api/orders/:id
+  // ==========================
+  static async deleteOrder(req, res) {
+    try {
+      const { id } = req.params;
+
+      await OrderModel.deleteOrder(id);
+
+      return res.status(200).json({
+        success: true,
+        message: "Order deleted successfully",
+      });
+    } catch (error) {
+      console.error("deleteOrder error:", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to delete order" });
     }
   }
 }

@@ -9,20 +9,26 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import ProductController from "./controllers/productController.js";
+
+import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import customerRoutes from "./routes/customerRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+
 import paymentRoutes from "./routes/paymentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+
 import errorHandler from "./middleware/errorHandler.js";
 
 import { connectDB } from "./config/db.js";
 import { setupDatabase } from "./utils/setupDatabase.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config();
 
 const app = express();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(
@@ -31,12 +37,14 @@ app.use(
     credentials: true,
   }),
 );
+
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
     crossOriginEmbedderPolicy: false,
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -44,13 +52,18 @@ app.use(cookieParser());
 // Static Folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/reports", reportRoutes);
+
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Backward-compatible alias for product detail
+// Backward-compatible alias
 app.get("/products/:id", ProductController.getProductById);
 
 // Test Route
@@ -61,7 +74,7 @@ app.get("/", async (req, res) => {
   });
 });
 
-// Global Error Handler (must be after routes)
+// Global Error Handler
 app.use(errorHandler);
 
 // Start Server

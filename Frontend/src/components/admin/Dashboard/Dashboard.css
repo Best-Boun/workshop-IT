@@ -1,0 +1,99 @@
+.dashboard-page {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===========================
+   Stats Cards
+=========================== */
+
+.dashboard-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  padding: 22px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 16px;
+
+  color: white;
+  font-size: 28px;
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-info p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.card-info h3 {
+  margin: 6px 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-info small {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* ===========================
+   Dashboard Placeholder
+=========================== */
+
+.dashboard-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+
+  background: var(--input-bg);
+}
+
+.placeholder-large {
+  height: 320px;
+}
+
+.placeholder-small {
+  height: 250px;
+}
+
+.placeholder-icon {
+  font-size: 50px;
+  color: #94a3b8;
+}
+
+.placeholder-text {
+  margin-top: 16px;
+  margin-bottom: 0;
+
+  color: var(--text-secondary);
+}

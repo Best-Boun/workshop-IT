@@ -1,11 +1,51 @@
-/* Global Reset */
+/* ===========================
+   Theme Variables
+=========================== */
+
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #111827;
+  --text-secondary: #64748b;
+  --border: #e5e7eb;
+  --primary: #2563eb;
+  --hover: #eff6ff;
+  --input-bg: #f8fafc;
+  --sidebar-bg: #111827;
+--sidebar-hover: #1e293b;
+--sidebar-text: #cbd5e1;
+--sidebar-border: rgba(255, 255, 255, 0.08);
+}
+
+body[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --primary: #3b82f6;
+  --hover: #334155;
+  --input-bg: #334155;
+  --sidebar-bg: #020617;
+--sidebar-hover: #1e293b;
+--sidebar-text: #e2e8f0;
+--sidebar-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ===========================
+   Global Reset
+=========================== */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Root */
+/* ===========================
+   Root
+=========================== */
+
 html,
 body,
 #root {
@@ -15,40 +55,82 @@ body,
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #f8f9fa;
-  color: #212529;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.5;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-/* Links */
+/* ให้ทุก Component เปลี่ยนสีลื่นขึ้น */
+div,
+section,
+header,
+aside,
+main,
+nav,
+article,
+footer {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* ===========================
+   Links
+=========================== */
+
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Images */
+/* ===========================
+   Images
+=========================== */
+
 img {
-  max-width: 100%;
   display: block;
+  max-width: 100%;
 }
 
-/* Lists */
+/* ===========================
+   Lists
+=========================== */
+
 ul,
 ol {
   list-style: none;
 }
 
-/* Buttons */
+/* ===========================
+   Buttons
+=========================== */
+
 button {
   font: inherit;
   cursor: pointer;
   border: none;
   background: none;
+  color: inherit;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-/* Inputs */
+/* ===========================
+   Form
+=========================== */
+
 input,
 textarea,
 select {
   font: inherit;
+  color: inherit;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
 }

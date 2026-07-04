@@ -116,6 +116,82 @@ class ProductController {
       });
     }
   }
+
+  static async createProduct(req, res) {
+    try {
+      const product = {
+        ...req.body,
+        image: req.file ? req.file.filename : "",
+      };
+
+      const result = await ProductModel.createProduct(product);
+
+      res.status(201).json({
+        success: true,
+        message: "Product created successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to create product",
+      });
+    }
+  }
+
+  static async updateProduct(req, res) {
+    try {
+      const { id } = req.params;
+
+      const product = {
+        ...req.body,
+      };
+
+      if (req.file) {
+        product.image = req.file.filename;
+      }
+
+      const result = await ProductModel.updateProduct(id, product);
+
+      res.status(200).json({
+        success: true,
+        message: "Product updated successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to update product",
+      });
+    }
+  }
+
+  // DELETE /api/products/:id
+  static async deleteProduct(req, res) {
+    try {
+      const { id } = req.params;
+
+      await ProductModel.deleteProduct(id);
+
+      res.status(200).json({
+        success: true,
+        message: "Product deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete product",
+      });
+    }
+  }
 }
+
+
 
 export default ProductController;
