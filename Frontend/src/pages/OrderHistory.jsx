@@ -86,6 +86,11 @@ const OrderHistory = () => {
                         {order.item_count} item{order.item_count !== 1 ? "s" : ""}{" "}
                         · {order.shipping_city}, {order.shipping_country}
                       </div>
+                      {order.transaction_id && (
+                        <div className="text-muted small mt-1" style={{ wordBreak: "break-all" }}>
+                          Txn: <code style={{ fontSize: "0.75rem" }}>{order.transaction_id}</code>
+                        </div>
+                      )}
                     </div>
                     <div className="text-end">
                       <div className="order-amount mb-1">
@@ -94,6 +99,14 @@ const OrderHistory = () => {
                       <span className={`status-badge ${statusClass[order.status] || ""}`}>
                         {order.status}
                       </span>
+                      {order.payment_status && (
+                        <div className="mt-1">
+                          <span className={`badge rounded-pill ${order.payment_status === "completed" ? "bg-success" : "bg-warning text-dark"}`} style={{ fontSize: "0.7rem" }}>
+                            💳 {order.payment_status === "completed" ? "Paid" : order.payment_status}
+                            {order.payment_method ? ` · ${order.payment_method}` : ""}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

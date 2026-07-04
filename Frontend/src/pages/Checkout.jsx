@@ -75,7 +75,7 @@ const Checkout = () => {
       const orderId = res.data.data.orderId;
 
       if (!isBuyNowFlow) {
-        localStorage.removeItem("cart");
+        // Cart will be cleared after payment succeeds (in Payment.jsx)
       }
 
       navigate(`/payment/${orderId}`, { state: { total } });

@@ -6,8 +6,10 @@ class OrderController {
   // POST /api/orders  →  Checkout (create order)
   // ==========================
   static async createOrder(req, res) {
-    try {
-      const userId = req.user.id;
+  try {
+    console.log("===== CREATE ORDER =====");
+
+    const userId = req.user.id;
       const {
         items,
         shipping_address,
@@ -37,6 +39,7 @@ class OrderController {
         shipping_country,
         total_amount,
       });
+      console.log("NEW ORDER ID:", orderId);
 
       return res.status(201).json({
         success: true,
@@ -132,12 +135,12 @@ class OrderController {
       const { status } = req.body;
 
       const validStatuses = [
-        "pending",
-        "processing",
-        "shipped",
-        "delivered",
-        "cancelled",
-      ];
+  "Pending",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+];
 
       if (!validStatuses.includes(status)) {
         return res
@@ -177,7 +180,7 @@ class OrderController {
         return res.status(403).json({ success: false, message: "Forbidden" });
       }
 
-      if (!["pending", "processing"].includes(order.status)) {
+      if (!["Pending", "Processing"].includes(order.status)) {
         return res.status(400).json({
           success: false,
           message: "Cannot cancel order at this stage",

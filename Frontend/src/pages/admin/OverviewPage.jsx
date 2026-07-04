@@ -23,12 +23,12 @@ const OverviewPage = () => {
 
   const cards = stats
     ? [
-        { label: "Total Revenue", value: `฿${Number(stats.orders.total_revenue || 0).toLocaleString()}`, subtitle: `${stats.orders.total_orders} orders total` },
+        { label: "Total Revenue", value: `฿${Number(stats.payments.total_paid || 0).toLocaleString()}`, subtitle: `${stats.orders.total_orders} orders total` },
+        { label: "Today's Revenue", value: `฿${Number(stats.payments.today_revenue || 0).toLocaleString()}`, subtitle: "completed payments today" },
+        { label: "Monthly Revenue", value: `฿${Number(stats.payments.monthly_revenue || 0).toLocaleString()}`, subtitle: "this month" },
         { label: "Total Orders", value: Number(stats.orders.total_orders).toLocaleString(), subtitle: `${stats.orders.pending_count} pending` },
         { label: "Registered Users", value: Number(stats.users.total_users).toLocaleString(), subtitle: "customers" },
         { label: "Total Products", value: Number(stats.products.total_products).toLocaleString(), subtitle: `${stats.products.low_stock} low stock` },
-        { label: "Inventory Value", value: `฿${Number(stats.products.inventory_value || 0).toLocaleString()}`, subtitle: `${stats.products.out_of_stock} out of stock` },
-        { label: "Total Paid", value: `฿${Number(stats.payments.total_paid || 0).toLocaleString()}`, subtitle: `${stats.payments.failed_count} failed payments` },
       ]
     : [];
 
@@ -52,6 +52,7 @@ const OverviewPage = () => {
       </div>
 
       {stats && (
+        <>
         <div className="row g-3">
           <div className="col-12 col-lg-6">
             <div className="admin-summary-panel p-4 rounded shadow-sm">
@@ -92,6 +93,31 @@ const OverviewPage = () => {
             </div>
           </div>
         </div>
+        <div className="row g-3 mt-1">
+          <div className="col-12 col-lg-6">
+            <div className="admin-summary-panel p-4 rounded shadow-sm">
+              <h5 className="mb-3">Payment Summary</h5>
+              <ul className="list-unstyled mb-0">
+                <li className="mb-2">✅ Successful Payments: <strong className="text-success">{stats.payments.completed}</strong></li>
+                <li className="mb-2">🕐 Pending Payments: <strong className="text-warning">{stats.payments.pending}</strong></li>
+                <li className="mb-2">❌ Failed Payments: <strong className="text-danger">{stats.payments.failed}</strong></li>
+                <li className="mb-2">↩️ Refunded Payments: <strong>{stats.payments.refunded}</strong></li>
+                <li className="mb-2 pt-2 border-top">💰 Total Paid: <strong>฿{Number(stats.payments.total_paid || 0).toLocaleString()}</strong></li>
+              </ul>
+            </div>
+          </div>
+          <div className="col-12 col-lg-6">
+            <div className="admin-summary-panel p-4 rounded shadow-sm">
+              <h5 className="mb-3">Revenue</h5>
+              <ul className="list-unstyled mb-0">
+                <li className="mb-2">📅 Today: <strong>฿{Number(stats.payments.today_revenue || 0).toLocaleString()}</strong></li>
+                <li className="mb-2">🗓️ This Month: <strong>฿{Number(stats.payments.monthly_revenue || 0).toLocaleString()}</strong></li>
+                <li className="mb-2 pt-2 border-top">💼 Total Revenue: <strong>฿{Number(stats.payments.total_paid || 0).toLocaleString()}</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        </>
       )}
     </div>
   );

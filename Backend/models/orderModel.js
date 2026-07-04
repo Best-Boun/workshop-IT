@@ -19,7 +19,7 @@ class OrderModel {
 
       const [orderResult] = await conn.execute(
         `INSERT INTO orders
-          (user_id, total_amount, shipping_address, shipping_city, shipping_postal_code, shipping_country)
+          (user_id, total_price, shipping_address, shipping_city, shipping_postal_code, shipping_country)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
           userId,
@@ -35,9 +35,9 @@ class OrderModel {
 
       for (const item of items) {
         await conn.execute(
-          `INSERT INTO order_items (order_id, product_id, quantity, price)
-           VALUES (?, ?, ?, ?)`,
-          [orderId, item.product_id, item.quantity, item.price],
+          `INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
+           VALUES (?, ?, ?, ?, ?)`,
+          [orderId, item.product_id, item.quantity, item.price, item.quantity * item.price],
         );
 
         // หักสต็อกสินค้า
@@ -60,7 +60,7 @@ class OrderModel {
   // ดึง order ตาม id พร้อม items
   static async getOrderById(orderId) {
     const [rows] = await pool.query(
-      `SELECT o.*, u.first_name, u.last_name, u.email
+      `SELECT o.*, o.total_price AS total_amount, u.first_name, u.last_name, u.email
        FROM orders o
        JOIN users u ON o.user_id = u.id
        WHERE o.id = ?`,
@@ -83,14 +83,18 @@ class OrderModel {
     return order;
   }
 
-  // ดึง orders ของ user (order history)
+  // ดึง orders ของ user (order history) พร้อมข้อมูล payment
   static async getOrdersByUserId(userId) {
     const [rows] = await pool.query(
-      `SELECT o.*, COUNT(oi.id) AS item_count
+      `SELECT o.*, o.total_price AS total_amount, COUNT(oi.id) AS item_count,
+              p.payment_status AS payment_status,
+              p.payment_method,
+              p.transaction_id
        FROM orders o
        LEFT JOIN order_items oi ON o.id = oi.order_id
+       LEFT JOIN payments p ON o.id = p.order_id AND p.payment_status = 'completed'
        WHERE o.user_id = ?
-       GROUP BY o.id
+       GROUP BY o.id, p.payment_status, p.payment_method, p.transaction_id
        ORDER BY o.created_at DESC`,
       [userId],
     );
@@ -100,7 +104,7 @@ class OrderModel {
   // ดึง orders ทั้งหมด (admin)
   static async getAllOrders() {
     const [rows] = await pool.query(
-      `SELECT o.*, u.first_name, u.last_name, u.email, COUNT(oi.id) AS item_count
+      `SELECT o.*, o.total_price AS total_amount, u.first_name, u.last_name, u.email, COUNT(oi.id) AS item_count
        FROM orders o
        JOIN users u ON o.user_id = u.id
        LEFT JOIN order_items oi ON o.id = oi.order_id

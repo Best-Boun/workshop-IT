@@ -56,6 +56,11 @@ const Payment = () => {
 
       const res = await api.post("/payments/process", payload);
 
+      // ล้างตะกร้าสินค้าหลังชำระเงินสำเร็จ
+      if (res.data.success) {
+        localStorage.removeItem("cart");
+      }
+
       setResult({
         success: res.data.success,
         transactionId: res.data.data?.transactionId,

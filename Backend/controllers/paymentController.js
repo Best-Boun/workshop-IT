@@ -1,5 +1,6 @@
 import PaymentModel from "../models/paymentModel.js";
 import OrderModel from "../models/orderModel.js";
+import { pool } from "../config/db.js";
 
 class PaymentController {
   // ==========================
@@ -38,6 +39,7 @@ class PaymentController {
 
       // ตรวจสอบว่าชำระเงินแล้วหรือยัง
       const existingPayment = await PaymentModel.getPaymentByOrderId(order_id);
+      console.log(existingPayment);
       if (existingPayment && existingPayment.status === "completed") {
         return res.status(400).json({
           success: false,
@@ -47,6 +49,8 @@ class PaymentController {
 
       // Simulation: card ending in 0002 → decline (test failure card)
       const lastFour = card_number ? card_number.replace(/\s/g, "").slice(-4) : "1111";
+      console.log("CARD:", card_number);
+console.log("LAST4:", lastFour);
       const isDeclined = lastFour === "0002";
 
       const transactionId = `TXN-${Date.now()}-${Math.random()
@@ -58,7 +62,6 @@ class PaymentController {
 
       const paymentId = await PaymentModel.createPayment({
         order_id,
-        user_id: userId,
         amount: order.total_amount,
         payment_method,
         transaction_id: transactionId,
@@ -66,7 +69,10 @@ class PaymentController {
       });
 
       if (!isDeclined) {
-        await OrderModel.updateOrderStatus(order_id, "processing");
+        console.log("STATUS TO UPDATE =", "Paid");
+        const [rows] = await pool.query("SHOW COLUMNS FROM orders LIKE 'status'");
+console.log(rows);
+        await OrderModel.updateOrderStatus(order_id, "Processing");
       }
 
       return res.status(200).json({
