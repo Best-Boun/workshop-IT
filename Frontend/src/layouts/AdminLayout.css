@@ -13,6 +13,7 @@
     background:var(--bg);
     color:var(--text);
     transition:.25s;
+    margin-left: 260px;
 }
 
 .admin-content{
@@ -21,4 +22,16 @@
     background:var(--bg);
     color:var(--text);
     transition:.25s;
+}
+
+@media (max-width: 992px) {
+    .admin-sidebar {
+        position: relative;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .admin-main {
+        margin-left: 0;
+    }
 }

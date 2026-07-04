@@ -12,23 +12,7 @@ import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
 
-import {
-  PrivateRoute,
-  AdminRoute,
-  SuperAdminRoute,
-} from "./components/PrivateRoute";
-
-// ===== เพื่อน =====
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import OverviewPage from "./pages/admin/OverviewPage";
-import SalesAnalyticsPage from "./pages/admin/SalesAnalyticsPage";
-import OrderManagementPage from "./pages/admin/OrderManagementPage";
-import TopProductsPage from "./pages/admin/TopProductsPage";
-import InventoryPage from "./pages/admin/InventoryPage";
-import CustomerAnalyticsPage from "./pages/admin/CustomerAnalyticsPage";
-import PaymentPage from "./pages/admin/PaymentPage";
-import ReportsPage from "./pages/admin/ReportsPage";
-import AdminManagementPage from "./pages/admin/AdminManagementPage";
+import { PrivateRoute, AdminRoute, AdminPageRoute } from "./components/PrivateRoute";
 
 // ===== ของมึง =====
 import AdminLayout from "./layouts/AdminLayout";
@@ -49,6 +33,8 @@ import Customers from "./pages/admin/Customers";
 import CustomerDetail from "./pages/admin/CustomerDetail";
 
 import Reports from "./pages/admin/Reports";
+import LogSecurityPage from "./pages/admin/LogSecurityPage";
+import AdminManagementPage from "./pages/admin/AdminManagementPage";
 
 function App() {
   return (
@@ -107,46 +93,134 @@ function App() {
           </AdminRoute>
         }
       >
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route
+          path="dashboard"
+          element={
+            <AdminPageRoute pageKey="dashboard">
+              <Dashboard />
+            </AdminPageRoute>
+          }
+        />
 
-        <Route path="products" element={<ProductsAdmin />} />
-        <Route path="products/add" element={<AddProduct />} />
-        <Route path="products/edit/:id" element={<EditProduct />} />
+        <Route
+          path="products"
+          element={
+            <AdminPageRoute pageKey="products">
+              <ProductsAdmin />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="products/add"
+          element={
+            <AdminPageRoute pageKey="products" mode="manage">
+              <AddProduct />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="products/edit/:id"
+          element={
+            <AdminPageRoute pageKey="products" mode="manage">
+              <EditProduct />
+            </AdminPageRoute>
+          }
+        />
 
-        <Route path="categories" element={<Categories />} />
-        <Route path="categories/add" element={<AddCategory />} />
-        <Route path="categories/edit/:id" element={<EditCategory />} />
+        <Route
+          path="categories"
+          element={
+            <AdminPageRoute pageKey="categories">
+              <Categories />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="categories/add"
+          element={
+            <AdminPageRoute pageKey="categories" mode="manage">
+              <AddCategory />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="categories/edit/:id"
+          element={
+            <AdminPageRoute pageKey="categories" mode="manage">
+              <EditCategory />
+            </AdminPageRoute>
+          }
+        />
 
-        <Route path="orders" element={<Orders />} />
-        <Route path="orders/:id" element={<OrderDetail />} />
+        <Route
+          path="orders"
+          element={
+            <AdminPageRoute pageKey="orders">
+              <Orders />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="orders/:id"
+          element={
+            <AdminPageRoute pageKey="orders">
+              <OrderDetail />
+            </AdminPageRoute>
+          }
+        />
 
-        <Route path="customers" element={<Customers />} />
-        <Route path="customers/:id" element={<CustomerDetail />} />
+        <Route
+          path="customers"
+          element={
+            <AdminPageRoute pageKey="customers">
+              <Customers />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="customers/:id"
+          element={
+            <AdminPageRoute pageKey="customers">
+              <CustomerDetail />
+            </AdminPageRoute>
+          }
+        />
 
-        <Route path="reports" element={<Reports />} />
+        <Route
+          path="reports"
+          element={
+            <AdminPageRoute pageKey="reports">
+              <Reports />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="admin-management"
+          element={
+            <AdminPageRoute pageKey="adminManagement">
+              <AdminManagementPage />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="reports/admin-management"
+          element={
+            <AdminPageRoute pageKey="adminManagement">
+              <AdminManagementPage />
+            </AdminPageRoute>
+          }
+        />
+        <Route
+          path="logs-security"
+          element={
+            <AdminPageRoute pageKey="logsSecurity">
+              <LogSecurityPage />
+            </AdminPageRoute>
+          }
+        />
       </Route>
 
-      {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
-      <Route
-        path="/superadmin"
-        element={
-          <SuperAdminRoute>
-            <AdminDashboard />
-          </SuperAdminRoute>
-        }
-      >
-        <Route index element={<OverviewPage />} />
-        <Route path="overview" element={<OverviewPage />} />
-        <Route path="sales" element={<SalesAnalyticsPage />} />
-        <Route path="orders" element={<OrderManagementPage />} />
-        <Route path="top-products" element={<TopProductsPage />} />
-        <Route path="inventory" element={<InventoryPage />} />
-        <Route path="customers" element={<CustomerAnalyticsPage />} />
-        <Route path="payments" element={<PaymentPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="admin-management" element={<AdminManagementPage />} />
-      </Route>
-
+      {/* Legacy super-admin routes removed; all admin access now uses /admin */}
       {/* Route เดิมของเพื่อน */}
       <Route
         path="/admin/orders"

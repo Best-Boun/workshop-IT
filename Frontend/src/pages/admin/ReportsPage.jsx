@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const ReportsPage = () => {
   return (
     <div>
@@ -27,6 +29,9 @@ const ReportsPage = () => {
         <div className="d-flex flex-wrap gap-2 mb-3">
           <button className="btn btn-primary btn-sm">Download Excel</button>
           <button className="btn btn-outline-secondary btn-sm">Download PDF</button>
+          <Link to="/admin/admin-management" className="btn btn-outline-primary btn-sm">
+            Manage Admins
+          </Link>
         </div>
         <p className="text-muted mb-0">ดาวน์โหลดรายงานยอดขายและการสต็อกเพื่อใช้งานต่อได้ทันที</p>
       </div>

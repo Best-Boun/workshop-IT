@@ -6,6 +6,24 @@ import generateToken from "../utils/generateToken.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const parsePermissions = (permissions) => {
+  if (!permissions) return {};
+
+  if (typeof permissions === "string") {
+    try {
+      return JSON.parse(permissions);
+    } catch {
+      return {};
+    }
+  }
+
+  if (typeof permissions === "object") {
+    return permissions;
+  }
+
+  return {};
+};
+
 class AuthService {
   // =========================
   // Register
@@ -68,6 +86,7 @@ class AuthService {
         last_name: user.last_name,
         email: user.email,
         role: user.role,
+        permissions: parsePermissions(user.permissions),
       },
     };
   }
@@ -99,7 +118,10 @@ class AuthService {
 
     return {
       token,
-      user,
+      user: {
+        ...user,
+        permissions: parsePermissions(user.permissions),
+      },
     };
   }
 }

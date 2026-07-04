@@ -5,6 +5,7 @@ import LatestOrders from "../../components/admin/Dashboard/LatestOrders";
 import TopProducts from "../../components/admin/Dashboard/TopProducts";
 import LowStock from "../../components/admin/Dashboard/LowStock";
 import QuickActions from "../../components/admin/Dashboard/QuickActions";
+import ReportsPage from "./ReportsPage";
 
 
 
@@ -36,6 +37,10 @@ const Dashboard = () => {
       </div>
 
       <QuickActions />
+
+      <div className="mt-4">
+        <ReportsPage />
+      </div>
     </div>
   );
 };

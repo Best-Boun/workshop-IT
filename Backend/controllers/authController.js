@@ -71,7 +71,24 @@ class AuthController {
 
       const { password: _pw, ...safeUser } = user;
 
-      return res.status(200).json({ success: true, data: safeUser });
+      let parsedPermissions = {};
+      if (safeUser.permissions && typeof safeUser.permissions === "string") {
+        try {
+          parsedPermissions = JSON.parse(safeUser.permissions);
+        } catch {
+          parsedPermissions = {};
+        }
+      } else if (safeUser.permissions && typeof safeUser.permissions === "object") {
+        parsedPermissions = safeUser.permissions;
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...safeUser,
+          permissions: parsedPermissions,
+        },
+      });
     } catch (error) {
       return res.status(500).json({ success: false, message: "Server error" });
     }

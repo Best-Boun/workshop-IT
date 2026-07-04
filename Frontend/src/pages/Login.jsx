@@ -70,9 +70,7 @@ const Login = () => {
       setTimeout(() => {
         const role = res.data.user.role;
 
-        if (role === "superadmin") {
-          window.location.href = "/superadmin";
-        } else if (role === "admin") {
+        if (role === "admin") {
           window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/";
