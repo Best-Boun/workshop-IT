@@ -11,6 +11,7 @@ import Payment from "./pages/Payment";
 import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
+import MyProfile from "./pages/MyProfile";
 
 import {
   PrivateRoute,
@@ -87,6 +88,15 @@ function App() {
           element={
             <PrivateRoute>
               <TrackOrder />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <MyProfile />
             </PrivateRoute>
           }
         />

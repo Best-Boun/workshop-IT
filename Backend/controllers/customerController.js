@@ -1,6 +1,115 @@
 import CustomerModel from "../models/customerModel.js";
+import UserModel from "../models/userModel.js";
 
 class CustomerController {
+  // GET /api/users/profile
+  static async getMyProfile(req, res) {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
+      const profile = await UserModel.getProfileById(userId);
+
+      if (!profile) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: profile,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch profile",
+      });
+    }
+  }
+
+  // PUT /api/users/profile
+  static async updateMyProfile(req, res) {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
+      const existingProfile = await UserModel.getProfileById(userId);
+
+      if (!existingProfile) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      const nextFirstName = req.body.first_name?.trim();
+      const nextLastName = req.body.last_name?.trim();
+
+      if (!nextFirstName || !nextLastName) {
+        return res.status(400).json({
+          success: false,
+          message: "First name and last name are required",
+        });
+      }
+
+      let normalizedPhone = null;
+      if (req.body.phone !== undefined && req.body.phone !== null) {
+        const phoneValue = String(req.body.phone).trim();
+
+        if (phoneValue !== "") {
+          if (!/^\d+$/.test(phoneValue)) {
+            return res.status(400).json({
+              success: false,
+              message: "Phone number must contain digits only",
+            });
+          }
+
+          normalizedPhone = phoneValue;
+        }
+      }
+
+      const updatePayload = {
+        first_name: nextFirstName,
+        last_name: nextLastName,
+        phone: normalizedPhone,
+        address: req.body.address ?? null,
+      };
+
+      await UserModel.updateProfileById(userId, updatePayload);
+
+      const updatedProfile = await UserModel.getProfileById(userId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: updatedProfile,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update profile",
+      });
+    }
+  }
+
   // GET /api/customers
   static async getAllCustomers(req, res) {
     try {

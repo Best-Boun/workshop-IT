@@ -21,6 +21,53 @@ class UserModel {
     return rows[0] || null;
   }
 
+  // ดึงข้อมูลโปรไฟล์ของผู้ใช้สำหรับหน้า My Profile
+  static async getProfileById(id) {
+    const [rows] = await pool.execute(
+      `SELECT
+         id,
+         first_name,
+         last_name,
+         email,
+         phone,
+         address,
+         profile_image,
+         role,
+         google_id,
+         updated_at
+       FROM users
+       WHERE id = ?
+       LIMIT 1`,
+      [id],
+    );
+
+    return rows[0] || null;
+  }
+
+  // อัปเดตข้อมูลโปรไฟล์ (ห้ามแก้ email)
+  static async updateProfileById(id, profileData) {
+    const {
+      first_name,
+      last_name,
+      phone = null,
+      address = null,
+    } = profileData;
+
+    const [result] = await pool.execute(
+      `UPDATE users
+       SET
+         first_name = ?,
+         last_name = ?,
+         phone = ?,
+         address = ?,
+         updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [first_name, last_name, phone, address, id],
+    );
+
+    return result.affectedRows;
+  }
+
   // ดึง admins และ superadmins
   static async getAdmins() {
     const [rows] = await pool.execute(

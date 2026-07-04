@@ -14,6 +14,8 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import CustomerController from "./controllers/customerController.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 
 import paymentRoutes from "./routes/paymentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -59,6 +61,10 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/reports", reportRoutes);
+
+// Profile endpoints (reuse existing controller + auth middleware)
+app.get("/api/users/profile", authMiddleware, CustomerController.getMyProfile);
+app.put("/api/users/profile", authMiddleware, CustomerController.updateMyProfile);
 
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
