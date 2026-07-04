@@ -68,7 +68,15 @@ const Login = () => {
       });
 
       setTimeout(() => {
-        window.location.href = "/";
+        const role = res.data.user.role;
+
+        if (role === "superadmin") {
+          window.location.href = "/superadmin";
+        } else if (role === "admin") {
+          window.location.href = "/admin/dashboard";
+        } else {
+          window.location.href = "/";
+        }
       }, 800);
     } catch (err) {
       setStatus({

@@ -26,9 +26,10 @@ const AdminDashboard = () => {
                 <i className="bi bi-speedometer2 fs-4" />
               </div>
               <div>
-                <h2 className="mb-1">TechPulse Admin</h2>
+                <h2 className="mb-1">TechPulse Super Admin</h2>
                 <p className="text-muted mb-0">
-                  แดชบอร์ดการบริหารร้านค้า ดูภาพรวมยอดขาย สต็อก และคำสั่งซื้อทั้งหมดได้ในที่เดียว
+                  แดชบอร์ดการบริหารร้านค้า ดูภาพรวมยอดขาย สต็อก
+                  และคำสั่งซื้อทั้งหมดได้ในที่เดียว
                 </p>
               </div>
             </div>
@@ -39,7 +40,8 @@ const AdminDashboard = () => {
                 <span className="badge bg-danger ms-2">3</span>
               </button>
               <button className="btn btn-primary btn-sm">
-                <i className="bi bi-file-earmark-arrow-down me-1" /> Download Report
+                <i className="bi bi-file-earmark-arrow-down me-1" /> Download
+                Report
               </button>
               <button className="btn btn-outline-secondary btn-sm">
                 <i className="bi bi-gear-fill" /> Settings
@@ -65,7 +67,9 @@ const AdminDashboard = () => {
                   }
                 >
                   <span className="nav-link-icon me-2">
-                    <i className={`bi bi-${section.path === "overview" ? "grid-3x3-gap" : section.path === "sales" ? "graph-up" : section.path === "orders" ? "basket3" : section.path === "top-products" ? "star-fill" : section.path === "inventory" ? "inbox-fill" : section.path === "customers" ? "people-fill" : section.path === "payments" ? "receipt-cutoff" : section.path === "admin-management" ? "person-gear" : "bell-fill"}`} />
+                    <i
+                      className={`bi bi-${section.path === "overview" ? "grid-3x3-gap" : section.path === "sales" ? "graph-up" : section.path === "orders" ? "basket3" : section.path === "top-products" ? "star-fill" : section.path === "inventory" ? "inbox-fill" : section.path === "customers" ? "people-fill" : section.path === "payments" ? "receipt-cutoff" : section.path === "admin-management" ? "person-gear" : "bell-fill"}`}
+                    />
                   </span>
                   {section.label}
                 </NavLink>

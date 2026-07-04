@@ -12,7 +12,11 @@ import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
 
-import { PrivateRoute, AdminRoute } from "./components/PrivateRoute";
+import {
+  PrivateRoute,
+  AdminRoute,
+  SuperAdminRoute,
+} from "./components/PrivateRoute";
 
 // ===== เพื่อน =====
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -124,11 +128,11 @@ function App() {
 
       {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
       <Route
-        path="/admin/dashboard-old"
+        path="/superadmin"
         element={
-          <AdminRoute>
+          <SuperAdminRoute>
             <AdminDashboard />
-          </AdminRoute>
+          </SuperAdminRoute>
         }
       >
         <Route index element={<OverviewPage />} />

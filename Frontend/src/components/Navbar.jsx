@@ -171,7 +171,11 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="#contact" onClick={handleContactClick}>
+              <a
+                className="nav-link"
+                href="#contact"
+                onClick={handleContactClick}
+              >
                 Contact
               </a>
             </li>
@@ -275,6 +279,7 @@ const Navbar = () => {
 
                         <div className="dropdown-section">Administration</div>
 
+                        {/* Admin Console */}
                         <Link
                           to="/admin/dashboard"
                           className="dropdown-item d-flex justify-content-between align-items-center"
@@ -287,6 +292,22 @@ const Navbar = () => {
 
                           <i className="bi bi-arrow-right-short fs-5"></i>
                         </Link>
+
+                        {/* Super Admin Console */}
+                        {user.role === "superadmin" && (
+                          <Link
+                            to="/superadmin/overview"
+                            className="dropdown-item d-flex justify-content-between align-items-center"
+                            onClick={() => setOpen(false)}
+                          >
+                            <span>
+                              <i className="bi bi-stars me-2 text-warning"></i>
+                              Super Console
+                            </span>
+
+                            <i className="bi bi-arrow-right-short fs-5"></i>
+                          </Link>
+                        )}
                       </>
                     )}
 

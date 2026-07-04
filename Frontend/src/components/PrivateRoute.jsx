@@ -1,8 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 /**
- * PrivateRoute - ต้อง login ก่อนเข้า
- * ถ้าไม่มี token จะ redirect ไป /login
+ * PrivateRoute - ต้อง Login ก่อนเข้า
  */
 const PrivateRoute = ({ children }) => {
   const token =
@@ -16,13 +15,13 @@ const PrivateRoute = ({ children }) => {
 };
 
 /**
- * AdminRoute - ต้อง login และมี role admin/superadmin
- * ถ้าไม่มี token จะ redirect ไป /login
- * ถ้า role ไม่ใช่ admin จะ redirect ไป /
+ * AdminRoute
+ * Admin และ Super Admin เข้าได้
  */
 const AdminRoute = ({ children }) => {
   const token =
     localStorage.getItem("token") || sessionStorage.getItem("token");
+
   const user = JSON.parse(
     localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
   );
@@ -38,4 +37,27 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
-export { PrivateRoute, AdminRoute };
+/**
+ * SuperAdminRoute
+ * เข้าได้เฉพาะ Super Admin
+ */
+const SuperAdminRoute = ({ children }) => {
+  const token =
+    localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== "superadmin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+};
+
+export { PrivateRoute, AdminRoute, SuperAdminRoute };
