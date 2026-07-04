@@ -20,7 +20,7 @@ class OrderModel {
 
       const [orderResult] = await conn.execute(
         `INSERT INTO orders
-          (user_id, total_amount, shipping_address, shipping_city, shipping_postal_code, shipping_country)
+          (user_id, total_price, shipping_address, shipping_city, shipping_postal_code, shipping_country)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
           userId,
@@ -36,23 +36,26 @@ class OrderModel {
 
       for (const item of items) {
         await conn.execute(
-          `INSERT INTO order_items
-          (order_id, product_id, quantity, price)
-          VALUES (?, ?, ?, ?)`,
-          [orderId, item.product_id, item.quantity, item.price],
+          `INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
+           VALUES (?, ?, ?, ?, ?)`,
+          [
+            orderId,
+            item.product_id,
+            item.quantity,
+            item.price,
+            item.quantity * item.price,
+          ],
         );
 
-        // หัก Stock
         await conn.execute(
           `UPDATE products
-           SET stock = GREATEST(stock - ?,0)
+           SET stock = GREATEST(stock - ?, 0)
            WHERE id = ?`,
           [item.quantity, item.product_id],
         );
       }
 
       await conn.commit();
-
       return orderId;
     } catch (err) {
       await conn.rollback();
@@ -67,6 +70,7 @@ class OrderModel {
     const [rows] = await pool.query(
       `SELECT
           o.*,
+          o.total_price AS total_amount,
           u.first_name,
           u.last_name,
           u.email
@@ -99,17 +103,24 @@ class OrderModel {
     return order;
   }
 
-  // Order History
+  // ดึง orders ของ user (order history)
   static async getOrdersByUserId(userId) {
     const [rows] = await pool.query(
       `SELECT
           o.*,
-          COUNT(oi.id) AS item_count
+          o.total_price AS total_amount,
+          COUNT(oi.id) AS item_count,
+          p.payment_status,
+          p.payment_method,
+          p.transaction_id
        FROM orders o
        LEFT JOIN order_items oi
          ON o.id = oi.order_id
+       LEFT JOIN payments p
+         ON o.id = p.order_id
+        AND p.payment_status = 'completed'
        WHERE o.user_id = ?
-       GROUP BY o.id
+       GROUP BY o.id, p.payment_status, p.payment_method, p.transaction_id
        ORDER BY o.created_at DESC`,
       [userId],
     );
@@ -122,6 +133,7 @@ class OrderModel {
     const [rows] = await pool.query(
       `SELECT
           o.*,
+          o.total_price AS total_amount,
           u.first_name,
           u.last_name,
           u.email,
