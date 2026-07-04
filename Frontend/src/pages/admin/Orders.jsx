@@ -123,9 +123,9 @@ const Orders = () => {
               >
                 <option value="">All Status</option>
                 <option value="Pending">Pending</option>
-                <option value="Paid">Paid</option>
-                <option value="Shipping">Shipping</option>
-                <option value="Completed">Completed</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>
@@ -160,14 +160,14 @@ const Orders = () => {
                       <td>
                         <span
                           className={`badge ${
-                            order.status === "Completed"
+                            order.status === "Delivered"
                               ? "bg-success"
                               : order.status === "Cancelled"
                                 ? "bg-danger"
-                                : order.status === "Shipping"
+                                : order.status === "Shipped"
                                   ? "bg-primary"
-                                  : order.status === "Paid"
-                                    ? "bg-info"
+                                  : order.status === "Processing"
+                                    ? "bg-warning text-dark"
                                     : "bg-secondary"
                           }`}
                         >

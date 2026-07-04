@@ -69,15 +69,17 @@ class OrderModel {
   static async getOrderById(orderId) {
     const [rows] = await pool.query(
       `SELECT
-          o.*,
-          o.total_price AS total_amount,
-          u.first_name,
-          u.last_name,
-          u.email
-       FROM orders o
-       JOIN users u
-         ON o.user_id = u.id
-       WHERE o.id = ?`,
+        o.*,
+        o.total_price AS total_amount,
+        CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
+        u.email AS customer_email,
+        u.first_name,
+        u.last_name,
+        u.email
+     FROM orders o
+     JOIN users u
+       ON o.user_id = u.id
+     WHERE o.id = ?`,
       [orderId],
     );
 
@@ -87,14 +89,14 @@ class OrderModel {
 
     const [items] = await pool.query(
       `SELECT
-          oi.*,
-          p.name,
-          p.image,
-          p.brand
-       FROM order_items oi
-       JOIN products p
-         ON oi.product_id = p.id
-       WHERE oi.order_id = ?`,
+        oi.*,
+        p.name AS product_name,
+        p.image AS product_image,
+        p.brand
+     FROM order_items oi
+     JOIN products p
+       ON oi.product_id = p.id
+     WHERE oi.order_id = ?`,
       [orderId],
     );
 
@@ -132,19 +134,24 @@ class OrderModel {
   static async getAllOrders() {
     const [rows] = await pool.query(
       `SELECT
-          o.*,
-          o.total_price AS total_amount,
-          u.first_name,
-          u.last_name,
-          u.email,
-          COUNT(oi.id) AS item_count
-       FROM orders o
-       JOIN users u
-         ON o.user_id = u.id
-       LEFT JOIN order_items oi
-         ON o.id = oi.order_id
-       GROUP BY o.id
-       ORDER BY o.created_at DESC`,
+        o.*,
+        o.total_price AS total_amount,
+        CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
+        u.first_name,
+        u.last_name,
+        u.email,
+        COUNT(oi.id) AS item_count
+     FROM orders o
+     JOIN users u
+       ON o.user_id = u.id
+     LEFT JOIN order_items oi
+       ON o.id = oi.order_id
+     GROUP BY
+       o.id,
+       u.first_name,
+       u.last_name,
+       u.email
+     ORDER BY o.created_at DESC`,
     );
 
     return rows;

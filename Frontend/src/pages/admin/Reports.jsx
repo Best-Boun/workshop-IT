@@ -5,6 +5,7 @@ import {
   getTopProducts,
   getCustomerReport,
   getRecentOrders,
+  getOrderStatusReport,
 } from "../../services/reportService";
 
 const Reports = () => {
@@ -13,6 +14,7 @@ const Reports = () => {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [statusSummary, setStatusSummary] = useState({});
 
   useEffect(() => {
     const loadReports = async () => {
@@ -23,12 +25,14 @@ const Reports = () => {
           productsData,
           customerData,
           recentOrdersData,
+          statusData,
         ] = await Promise.all([
           getDashboardSummary(),
           getMonthlySales(),
           getTopProducts(),
           getCustomerReport(),
           getRecentOrders(),
+          getOrderStatusReport(),
         ]);
 
         setSummary(summaryData);
@@ -36,6 +40,7 @@ const Reports = () => {
         setProducts(productsData || []);
         setCustomers(customerData);
         setRecentOrders(recentOrdersData || []);
+        setStatusSummary(statusData || {});
       } catch (error) {
         console.error("Error fetching reports:", error);
       }
@@ -51,19 +56,27 @@ const Reports = () => {
   const statusCards = [
     {
       label: "Pending",
-      value: summary.pending_orders || 0,
+      value: statusSummary.Pending || 0,
       color: "secondary",
     },
-    { label: "Processing", value: 0, color: "warning" },
-    { label: "Shipped", value: 0, color: "info" },
     {
-      label: "Completed",
-      value: summary.completed_orders || 0,
+      label: "Processing",
+      value: statusSummary.Processing || 0,
+      color: "warning",
+    },
+    {
+      label: "Shipped",
+      value: statusSummary.Shipped || 0,
+      color: "info",
+    },
+    {
+      label: "Delivered",
+      value: statusSummary.Delivered || 0,
       color: "success",
     },
     {
       label: "Cancelled",
-      value: summary.cancelled_orders || 0,
+      value: statusSummary.Cancelled || 0,
       color: "danger",
     },
   ];
@@ -146,7 +159,7 @@ const Reports = () => {
         <div className="col-xl-3 col-md-6">
           <div className="card shadow-sm border-0">
             <div className="card-body">
-              <h6 className="text-muted">Completed Orders</h6>
+              <h6 className="text-muted">Delivered Orders</h6>
               <h3 className="fw-bold mb-0">{summary.completed_orders || 0}</h3>
             </div>
           </div>
