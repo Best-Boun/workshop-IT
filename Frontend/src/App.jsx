@@ -17,6 +17,7 @@ import {
   AdminRoute,
   SuperAdminRoute,
 } from "./components/PrivateRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 // ===== เพื่อน =====
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -52,111 +53,115 @@ import Reports from "./pages/admin/Reports";
 
 function App() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/:id" element={<ProductDetail />} />
-      <Route path="/cart" element={<Cart />} />
+    <>
+      <ScrollToTop />
 
-      {/* User */}
-      <Route
-        path="/checkout"
-        element={
-          <PrivateRoute>
-            <Checkout />
-          </PrivateRoute>
-        }
-      />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
 
-      <Route
-        path="/payment/:orderId"
-        element={
-          <PrivateRoute>
-            <Payment />
-          </PrivateRoute>
-        }
-      />
+        {/* User */}
+        <Route
+          path="/checkout"
+          element={
+            <PrivateRoute>
+              <Checkout />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/orders"
-        element={
-          <PrivateRoute>
-            <OrderHistory />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/payment/:orderId"
+          element={
+            <PrivateRoute>
+              <Payment />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/track/:id"
-        element={
-          <PrivateRoute>
-            <TrackOrder />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/orders"
+          element={
+            <PrivateRoute>
+              <OrderHistory />
+            </PrivateRoute>
+          }
+        />
 
-      {/* Admin CRUD ของมึง */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route
+          path="/track/:id"
+          element={
+            <PrivateRoute>
+              <TrackOrder />
+            </PrivateRoute>
+          }
+        />
 
-        <Route path="products" element={<ProductsAdmin />} />
-        <Route path="products/add" element={<AddProduct />} />
-        <Route path="products/edit/:id" element={<EditProduct />} />
+        {/* Admin CRUD ของมึง */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
 
-        <Route path="categories" element={<Categories />} />
-        <Route path="categories/add" element={<AddCategory />} />
-        <Route path="categories/edit/:id" element={<EditCategory />} />
+          <Route path="products" element={<ProductsAdmin />} />
+          <Route path="products/add" element={<AddProduct />} />
+          <Route path="products/edit/:id" element={<EditProduct />} />
 
-        <Route path="orders" element={<Orders />} />
-        <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="categories/add" element={<AddCategory />} />
+          <Route path="categories/edit/:id" element={<EditCategory />} />
 
-        <Route path="customers" element={<Customers />} />
-        <Route path="customers/:id" element={<CustomerDetail />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
 
-        <Route path="reports" element={<Reports />} />
-      </Route>
+          <Route path="customers" element={<Customers />} />
+          <Route path="customers/:id" element={<CustomerDetail />} />
 
-      {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
-      <Route
-        path="/superadmin"
-        element={
-          <SuperAdminRoute>
-            <AdminDashboard />
-          </SuperAdminRoute>
-        }
-      >
-        <Route index element={<OverviewPage />} />
-        <Route path="overview" element={<OverviewPage />} />
-        <Route path="sales" element={<SalesAnalyticsPage />} />
-        <Route path="orders" element={<OrderManagementPage />} />
-        <Route path="top-products" element={<TopProductsPage />} />
-        <Route path="inventory" element={<InventoryPage />} />
-        <Route path="customers" element={<CustomerAnalyticsPage />} />
-        <Route path="payments" element={<PaymentPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="admin-management" element={<AdminManagementPage />} />
-      </Route>
+          <Route path="reports" element={<Reports />} />
+        </Route>
 
-      {/* Route เดิมของเพื่อน */}
-      <Route
-        path="/admin/orders"
-        element={
-          <AdminRoute>
-            <OrderManagement />
-          </AdminRoute>
-        }
-      />
-    </Routes>
+        {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
+        <Route
+          path="/superadmin"
+          element={
+            <SuperAdminRoute>
+              <AdminDashboard />
+            </SuperAdminRoute>
+          }
+        >
+          <Route index element={<OverviewPage />} />
+          <Route path="overview" element={<OverviewPage />} />
+          <Route path="sales" element={<SalesAnalyticsPage />} />
+          <Route path="orders" element={<OrderManagementPage />} />
+          <Route path="top-products" element={<TopProductsPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="customers" element={<CustomerAnalyticsPage />} />
+          <Route path="payments" element={<PaymentPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="admin-management" element={<AdminManagementPage />} />
+        </Route>
+
+        {/* Route เดิมของเพื่อน */}
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminRoute>
+              <OrderManagement />
+            </AdminRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

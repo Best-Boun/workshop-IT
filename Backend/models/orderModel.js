@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import AppError from "../utils/AppError.js";
 
 class OrderModel {
   // สร้าง order พร้อม items (transaction)
@@ -35,23 +36,49 @@ class OrderModel {
       const orderId = orderResult.insertId;
 
       for (const item of items) {
+        const requestedQty = Number(item.quantity) || 0;
+
+        if (requestedQty <= 0) {
+          throw new AppError("Invalid item quantity", 400);
+        }
+
+        const [productRows] = await conn.execute(
+          `SELECT id, name, stock
+           FROM products
+           WHERE id = ?
+           FOR UPDATE`,
+          [item.product_id],
+        );
+
+        const product = productRows[0];
+        if (!product) {
+          throw new AppError(`Product ${item.product_id} not found`, 404);
+        }
+
+        if (requestedQty > Number(product.stock || 0)) {
+          throw new AppError(
+            `Only ${product.stock} items available for ${product.name}`,
+            409,
+          );
+        }
+
         await conn.execute(
           `INSERT INTO order_items (order_id, product_id, quantity, price, subtotal)
            VALUES (?, ?, ?, ?, ?)`,
           [
             orderId,
             item.product_id,
-            item.quantity,
+            requestedQty,
             item.price,
-            item.quantity * item.price,
+            requestedQty * item.price,
           ],
         );
 
         await conn.execute(
           `UPDATE products
-           SET stock = GREATEST(stock - ?, 0)
+           SET stock = stock - ?
            WHERE id = ?`,
-          [item.quantity, item.product_id],
+          [requestedQty, item.product_id],
         );
       }
 

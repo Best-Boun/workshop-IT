@@ -48,6 +48,11 @@ class OrderController {
       });
     } catch (error) {
       console.error("createOrder error:", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Failed to create order" });

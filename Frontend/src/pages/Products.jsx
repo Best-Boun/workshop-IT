@@ -18,6 +18,7 @@ const Products = () => {
   const [cartQtyMap, setCartQtyMap] = useState({});
   const [pendingMap, setPendingMap] = useState({});
   const [microActionMap, setMicroActionMap] = useState({});
+  const [stockNoticeMap, setStockNoticeMap] = useState({});
 
   const categoryQuery = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -198,7 +199,8 @@ const Products = () => {
   const updateProductQuantity = async (product, nextQty) => {
     const previousSnapshot = getCartSnapshot();
     const prevQty = getQuantityFromSnapshot(previousSnapshot, product.id);
-    const boundedNextQty = Math.max(0, nextQty);
+    const stock = Math.max(0, Number(product.stock) || 0);
+    const boundedNextQty = Math.max(0, Math.min(nextQty, stock));
 
     if (prevQty === boundedNextQty) return;
 
@@ -228,7 +230,24 @@ const Products = () => {
   };
 
   const addToCart = (product) => {
+    const stock = Math.max(0, Number(product.stock) || 0);
     const currentQty = Number(cartQtyMap[product.id] || 0);
+
+    if (stock > 0 && currentQty >= stock) {
+      setStockNoticeMap((prev) => ({
+        ...prev,
+        [product.id]: `Only ${stock} items available.`,
+      }));
+      return;
+    }
+
+    setStockNoticeMap((prev) => {
+      if (!prev[product.id]) return prev;
+      const next = { ...prev };
+      delete next[product.id];
+      return next;
+    });
+
     updateProductQuantity(product, currentQty + 1);
   };
 
@@ -255,12 +274,37 @@ const Products = () => {
   };
 
   const increaseQty = (product) => {
+    const stock = Math.max(0, Number(product.stock) || 0);
     const currentQty = Number(cartQtyMap[product.id] || 0);
+
+    if (stock > 0 && currentQty >= stock) {
+      setStockNoticeMap((prev) => ({
+        ...prev,
+        [product.id]: `Only ${stock} items available.`,
+      }));
+      return;
+    }
+
+    setStockNoticeMap((prev) => {
+      if (!prev[product.id]) return prev;
+      const next = { ...prev };
+      delete next[product.id];
+      return next;
+    });
+
     updateProductQuantity(product, currentQty + 1);
   };
 
   const decreaseQty = (product) => {
     const currentQty = Number(cartQtyMap[product.id] || 0);
+
+    setStockNoticeMap((prev) => {
+      if (!prev[product.id]) return prev;
+      const next = { ...prev };
+      delete next[product.id];
+      return next;
+    });
+
     updateProductQuantity(product, currentQty - 1);
   };
 
@@ -386,6 +430,12 @@ const Products = () => {
         ) : (
           <div className="row g-4">
             {products.map((product) => (
+              (() => {
+                const stock = Math.max(0, Number(product.stock) || 0);
+                const currentQty = Number(cartQtyMap[product.id] || 0);
+                const isMaxInCart = stock > 0 && currentQty >= stock;
+
+                return (
               <div className="col-sm-6 col-lg-4" key={product.id}>
                 <div
                   className="card h-100 border-0 rounded-4 shadow-sm"
@@ -475,12 +525,12 @@ const Products = () => {
                     </div>
 
                     <div className="cart-action-shell">
-                      {Number(cartQtyMap[product.id] || 0) === 0 ? (
+                      {currentQty === 0 ? (
                         <div key="add" className="cart-action-switch cart-action-add-wrap">
                           <button
                             className="btn btn-primary rounded-pill w-100 fw-semibold"
                             onClick={(event) => handleAddToCartClick(event, product)}
-                            disabled={product.stock === 0 || pendingMap[product.id]}
+                            disabled={stock === 0 || pendingMap[product.id] || isMaxInCart}
                             aria-label={`Add ${product.name} to cart`}
                           >
                             🛒 Add to Cart
@@ -512,13 +562,25 @@ const Products = () => {
                             <button
                               className={`cart-qty-btn ${microActionMap[product.id] === "plus" ? "cart-qty-btn--active" : ""}`}
                               onClick={() => handleIncreaseQtyClick(product)}
-                              disabled={pendingMap[product.id]}
+                              disabled={pendingMap[product.id] || isMaxInCart}
                               aria-label={`Increase ${product.name} quantity`}
                             >
                               +
                             </button>
                           </div>
                         </div>
+                      )}
+
+                      {isMaxInCart && (
+                        <p className="small text-warning mb-0 mt-2 fw-semibold" aria-live="polite">
+                          Maximum stock reached
+                        </p>
+                      )}
+
+                      {!isMaxInCart && stockNoticeMap[product.id] && (
+                        <p className="small text-warning mb-0 mt-2 fw-semibold" aria-live="polite">
+                          {stockNoticeMap[product.id]}
+                        </p>
                       )}
                     </div>
 
@@ -531,6 +593,8 @@ const Products = () => {
                   </div>
                 </div>
               </div>
+                );
+              })()
             ))}
           </div>
         )}
