@@ -12,25 +12,11 @@ import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
 
-import { PrivateRoute, AdminRoute, AdminPageRoute } from "./components/PrivateRoute";
 import {
   PrivateRoute,
   AdminRoute,
-  SuperAdminRoute,
 } from "./components/PrivateRoute";
 import ScrollToTop from "./components/ScrollToTop";
-
-// ===== เพื่อน =====
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import OverviewPage from "./pages/admin/OverviewPage";
-import SalesAnalyticsPage from "./pages/admin/SalesAnalyticsPage";
-import OrderManagementPage from "./pages/admin/OrderManagementPage";
-import TopProductsPage from "./pages/admin/TopProductsPage";
-import InventoryPage from "./pages/admin/InventoryPage";
-import CustomerAnalyticsPage from "./pages/admin/CustomerAnalyticsPage";
-import PaymentPage from "./pages/admin/PaymentPage";
-import ReportsPage from "./pages/admin/ReportsPage";
-import AdminManagementPage from "./pages/admin/AdminManagementPage";
 
 // ===== ของมึง =====
 import AdminLayout from "./layouts/AdminLayout";
@@ -131,27 +117,8 @@ function App() {
           <Route path="customers/:id" element={<CustomerDetail />} />
 
           <Route path="reports" element={<Reports />} />
-        </Route>
-
-        {/* Dashboard เดิมของเพื่อน (เก็บไว้ก่อน) */}
-        <Route
-          path="/superadmin"
-          element={
-            <SuperAdminRoute>
-              <AdminDashboard />
-            </SuperAdminRoute>
-          }
-        >
-          <Route index element={<OverviewPage />} />
-          <Route path="overview" element={<OverviewPage />} />
-          <Route path="sales" element={<SalesAnalyticsPage />} />
-          <Route path="orders" element={<OrderManagementPage />} />
-          <Route path="top-products" element={<TopProductsPage />} />
-          <Route path="inventory" element={<InventoryPage />} />
-          <Route path="customers" element={<CustomerAnalyticsPage />} />
-          <Route path="payments" element={<PaymentPage />} />
-          <Route path="reports" element={<ReportsPage />} />
           <Route path="admin-management" element={<AdminManagementPage />} />
+          <Route path="logs-security" element={<LogSecurityPage />} />
         </Route>
 
         {/* Route เดิมของเพื่อน */}
