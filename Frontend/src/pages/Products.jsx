@@ -51,7 +51,7 @@ const Products = () => {
     if (brand) params.brand = brand;
     if (searchQuery) params.q = searchQuery;
 
-    const endpoint = searchQuery ? "/products/search" : "/products";
+    const endpoint = searchQuery ? "/products/search" : "/products/store";
 
     api
       .get(endpoint, { params })

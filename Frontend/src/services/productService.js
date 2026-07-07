@@ -34,6 +34,15 @@ export const deleteProduct = async (id) => {
   return response.data;
 };
 
+// เปลี่ยนสถานะสินค้า
+export const toggleProductStatus = async (id, status) => {
+  const response = await api.patch(`/products/${id}/status`, {
+    status,
+  });
+
+  return response.data;
+};
+
 // ดึงสินค้าที่ใกล้หมด
 export const getLowStockProducts = async () => {
   const response = await api.get("/products/low-stock");

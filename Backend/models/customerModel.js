@@ -61,14 +61,24 @@ class CustomerModel {
     const [recentOrders] = await pool.query(
       `
       SELECT
-        id,
-        status,
-        total_price,
-        created_at
-      FROM orders
-      WHERE user_id = ?
-      ORDER BY id DESC
-      LIMIT 5
+  o.id,
+  o.status,
+  o.total_price,
+  o.created_at,
+
+  p.payment_method,
+  p.payment_status
+
+FROM orders o
+
+LEFT JOIN payments p
+ON o.id = p.order_id
+
+WHERE o.user_id = ?
+
+ORDER BY o.id DESC
+
+LIMIT 5
       `,
       [id],
     );

@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCustomer } from "../../services/customerService";
 
+const paymentMethodMap = {
+  credit_card: "💳 Credit / Debit Card",
+  promptpay: "📱 PromptPay",
+  bank_transfer: "🏦 Bank Transfer",
+};
+
 const CustomerDetail = () => {
   const { id } = useParams();
   const [customer, setCustomer] = useState(null);
@@ -51,14 +57,7 @@ const CustomerDetail = () => {
               <p className="mb-2">
                 <strong>Role:</strong> {customer.role}
               </p>
-              <p className="mb-2">
-                <strong>Verified:</strong>{" "}
-                <span
-                  className={`badge ${customer.is_verified ? "bg-success" : "bg-secondary"}`}
-                >
-                  {customer.is_verified ? "Verified" : "Unverified"}
-                </span>
-              </p>
+
               <p className="mb-2">
                 <strong>Joined Date:</strong>{" "}
                 {customer.created_at
@@ -114,6 +113,7 @@ const CustomerDetail = () => {
                     <tr>
                       <th>Order ID</th>
                       <th>Status</th>
+                      <th>Payment</th>
                       <th>Total</th>
                       <th>Created Date</th>
                     </tr>
@@ -126,11 +126,26 @@ const CustomerDetail = () => {
                           <td>#{order.id}</td>
                           <td>
                             <span
-                              className={`badge ${order.status === "Completed" ? "bg-success" : order.status === "Cancelled" ? "bg-danger" : order.status === "Shipping" ? "bg-primary" : order.status === "Paid" ? "bg-info" : "bg-secondary"}`}
+                              className={`badge ${
+                                order.status === "Completed"
+                                  ? "bg-success"
+                                  : order.status === "Cancelled"
+                                    ? "bg-danger"
+                                    : order.status === "Shipping"
+                                      ? "bg-primary"
+                                      : order.status === "Paid"
+                                        ? "bg-info"
+                                        : "bg-secondary"
+                              }`}
                             >
                               {order.status}
                             </span>
                           </td>
+
+                          <td>
+                            {paymentMethodMap[order.payment_method] || "-"}
+                          </td>
+
                           <td>฿{Number(order.total_price).toLocaleString()}</td>
                           <td>
                             {order.created_at
@@ -141,7 +156,7 @@ const CustomerDetail = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4" className="text-center py-4 text-muted">
+                        <td colSpan="5" className="text-center py-4 text-muted">
                           No orders found.
                         </td>
                       </tr>

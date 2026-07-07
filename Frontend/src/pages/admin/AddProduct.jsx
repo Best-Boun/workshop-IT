@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -10,21 +10,21 @@ const AddProduct = () => {
 
     const [categories, setCategories] = useState([]);
 
+
+ const fetchCategories = async () => {
+   try {
+     const res = await api.get("/products/categories/all");
+     setCategories(res.data.data);
+   } catch (err) {
+     console.error(err);
+   }
+ };
+
     useEffect(() => {
       fetchCategories();
     }, []);
 
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:5000/api/products/categories/all",
-        );
-
-        setCategories(res.data.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+   
   const [formData, setFormData] = useState({
     category_id: "",
     sku: "",
@@ -64,15 +64,11 @@ const AddProduct = () => {
        data.append(key, formData[key]);
      });
 
-     const response = await axios.post(
-       "http://localhost:5000/api/products",
-       data,
-       {
-         headers: {
-           "Content-Type": "multipart/form-data",
-         },
+     const response = await api.post("/products", data, {
+       headers: {
+         "Content-Type": "multipart/form-data",
        },
-     );
+     });
 
      await Swal.fire({
        icon: "success",
@@ -106,7 +102,11 @@ const AddProduct = () => {
     } catch (error) {
       console.error("Add Product Error:", error);
 
-      alert(error.response?.data?.message || "Failed to add product.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Failed to add product.",
+      });
     }
   };
 
@@ -174,14 +174,20 @@ const AddProduct = () => {
               {/* Warranty */}
               <div className="col-md-6 mb-3">
                 <label className="form-label">Warranty</label>
-                <input
-                  type="text"
-                  className="form-control"
+                <select
+                  className="form-select"
                   name="warranty"
                   value={formData.warranty}
                   onChange={handleChange}
-                  placeholder="3 Years"
-                />
+                >
+                  <option value="">Select Warranty</option>
+                  <option value="No Warranty">No Warranty</option>
+                  <option value="6 Months">6 Months</option>
+                  <option value="1 Year">1 Year</option>
+                  <option value="2 Years">2 Years</option>
+                  <option value="3 Years">3 Years</option>
+                  <option value="5 Years">5 Years</option>
+                </select>
               </div>
 
               {/* SKU */}
@@ -265,14 +271,20 @@ const AddProduct = () => {
               {/* Warranty Provider */}
               <div className="col-md-6 mb-3">
                 <label className="form-label">Warranty Service</label>
-                <input
-                  type="text"
-                  className="form-control"
+                <select
+                  className="form-select"
                   name="warranty_provider"
                   value={formData.warranty_provider}
                   onChange={handleChange}
-                  placeholder="On-site"
-                />
+                >
+                  <option value="">Select Warranty Service</option>
+                  <option value="Carry-in Service">Carry-in Service</option>
+                  <option value="On-site Service">On-site Service</option>
+                  <option value="Pick-up & Return">Pick-up & Return</option>
+                  <option value="International Warranty">
+                    International Warranty
+                  </option>
+                </select>
               </div>
 
               {/* Price */}
@@ -280,6 +292,8 @@ const AddProduct = () => {
                 <label className="form-label">Price</label>
                 <input
                   type="number"
+                  min="0"
+                  step="0.01"
                   className="form-control"
                   name="price"
                   value={formData.price}
@@ -294,6 +308,7 @@ const AddProduct = () => {
                 <label className="form-label">Stock</label>
                 <input
                   type="number"
+                  min="0"
                   className="form-control"
                   name="stock"
                   value={formData.stock}

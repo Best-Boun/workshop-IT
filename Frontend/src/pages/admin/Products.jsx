@@ -3,6 +3,7 @@ import {
   getAllProducts,
   getCategories,
   deleteProduct,
+  toggleProductStatus,
 } from "../../services/productService";
 import { Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -74,6 +75,47 @@ const handleDelete = async (id) => {
     });
   }
 };
+
+const handleToggleStatus = async (product) => {
+  const newStatus = product.status === "active" ? "inactive" : "active";
+
+  const result = await Swal.fire({
+    title: "Change Product Status?",
+    html: `
+      <b>${product.name}</b><br/><br/>
+      Change status to <b>${newStatus}</b> ?
+    `,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes",
+    cancelButtonText: "Cancel",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await toggleProductStatus(product.id, newStatus);
+
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: "Product status updated successfully.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    fetchProducts();
+  } catch (error) {
+    console.error(error);
+
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Failed to update product status.",
+    });
+  }
+};
+
 
  useEffect(() => {
    fetchProducts();
@@ -252,6 +294,9 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
                               ? "bg-success"
                               : "bg-secondary"
                           }`}
+                          role="button"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleToggleStatus(product)}
                         >
                           {product.status === "active" ? "Active" : "Inactive"}
                         </span>

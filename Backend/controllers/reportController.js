@@ -138,6 +138,25 @@ class ReportController {
       });
     }
   }
+
+  // GET /api/reports/payment
+  static async getPaymentAnalytics(req, res) {
+    try {
+      const payment = await ReportModel.getPaymentAnalytics();
+
+      res.status(200).json({
+        success: true,
+        data: payment,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch payment analytics",
+      });
+    }
+  }
 }
 
 export default ReportController;

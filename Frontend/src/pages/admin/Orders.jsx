@@ -93,6 +93,12 @@ const Orders = () => {
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
+  const paymentMethodMap = {
+    credit_card: "💳 Credit / Debit Card",
+    promptpay: "📱 PromptPay",
+    bank_transfer: "🏦 Bank Transfer",
+  };
+
   return (
     <div className="container-fluid">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -142,6 +148,7 @@ const Orders = () => {
                   <th>Order ID</th>
                   <th>Customer Name</th>
                   <th>Total Price</th>
+                  <th>Payment</th>
                   <th>Status</th>
                   <th>Created Date</th>
                   <th className="text-center">Action</th>
@@ -157,6 +164,9 @@ const Orders = () => {
                       <td className="fw-semibold">
                         ฿{Number(order.total_price).toLocaleString()}
                       </td>
+
+                      <td>{paymentMethodMap[order.payment_method] || "-"}</td>
+
                       <td>
                         <span
                           className={`badge ${
@@ -200,7 +210,7 @@ const Orders = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-5 text-muted">
+                    <td colSpan="7" className="text-center py-5 text-muted">
                       No orders found.
                     </td>
                   </tr>

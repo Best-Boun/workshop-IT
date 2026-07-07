@@ -4,8 +4,15 @@ import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-// ดึงสินค้าทั้งหมด
+// ===============================
+// Products (Admin)
+// ===============================
+
+// ดึงสินค้าทั้งหมด (Admin เห็นทุกสินค้า)
 router.get("/", ProductController.getAllProducts);
+
+// ดึงสินค้าสำหรับหน้าร้าน (Customer เห็นเฉพาะ Active)
+router.get("/store", ProductController.getStoreProducts);
 
 // ค้นหาสินค้า
 router.get("/search", ProductController.searchProducts);
@@ -22,11 +29,18 @@ router.get("/low-stock", ProductController.getLowStockProducts);
 // ดึงรายละเอียดสินค้า
 router.get("/:id", ProductController.getProductById);
 
+// ===============================
+// CRUD
+// ===============================
+
 // เพิ่มสินค้า
 router.post("/", upload.single("image"), ProductController.createProduct);
 
 // แก้ไขสินค้า
 router.put("/:id", upload.single("image"), ProductController.updateProduct);
+
+// เปลี่ยนสถานะสินค้า
+router.patch("/:id/status", ProductController.toggleProductStatus);
 
 // ลบสินค้า
 router.delete("/:id", ProductController.deleteProduct);

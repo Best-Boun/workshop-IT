@@ -20,5 +20,6 @@ router.get("/customers", ReportController.getCustomerReport);
 
 router.get("/orders", ReportController.getRecentOrders);
 router.get("/status", ReportController.getOrderStatusReport);
+router.get("/payment", ReportController.getPaymentAnalytics);
 
 export default router;

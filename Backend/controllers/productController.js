@@ -22,6 +22,31 @@ class ProductController {
     }
   }
 
+  // GET /api/products/store
+  static async getStoreProducts(req, res) {
+    try {
+      const { category, brand } = req.query;
+
+      const products = await ProductModel.getStoreProducts({
+        category,
+        brand,
+      });
+
+      res.status(200).json({
+        success: true,
+        count: products.length,
+        data: products,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch store products",
+      });
+    }
+  }
+
   // GET /api/products/search?q=
   static async searchProducts(req, res) {
     try {
@@ -207,6 +232,28 @@ class ProductController {
       res.status(500).json({
         success: false,
         message: "Failed to fetch low stock products",
+      });
+    }
+  }
+
+  // PATCH /api/products/:id/status
+  static async toggleProductStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      await ProductModel.toggleProductStatus(id, status);
+
+      res.status(200).json({
+        success: true,
+        message: "Product status updated successfully",
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to update product status",
       });
     }
   }

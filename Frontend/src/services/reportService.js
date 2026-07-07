@@ -45,3 +45,9 @@ export const getOrderStatusReport = async () => {
   const response = await api.get("/reports/status");
   return response.data.data;
 };
+
+// ดึงสถิติการชำระเงิน
+export const getPaymentAnalytics = async () => {
+  const response = await api.get("/reports/payment");
+  return response.data.data;
+};

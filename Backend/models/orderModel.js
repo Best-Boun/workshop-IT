@@ -161,24 +161,40 @@ class OrderModel {
   static async getAllOrders() {
     const [rows] = await pool.query(
       `SELECT
-        o.*,
-        o.total_price AS total_amount,
-        CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
-        u.first_name,
-        u.last_name,
-        u.email,
-        COUNT(oi.id) AS item_count
-     FROM orders o
-     JOIN users u
-       ON o.user_id = u.id
-     LEFT JOIN order_items oi
-       ON o.id = oi.order_id
-     GROUP BY
-       o.id,
-       u.first_name,
-       u.last_name,
-       u.email
-     ORDER BY o.created_at DESC`,
+  o.*,
+  o.total_price AS total_amount,
+  CONCAT(u.first_name, ' ', u.last_name) AS customer_name,
+  u.first_name,
+  u.last_name,
+  u.email,
+
+  p.payment_method,
+  p.payment_status,
+  p.transaction_id,
+
+  COUNT(oi.id) AS item_count
+
+FROM orders o
+
+JOIN users u
+  ON o.user_id = u.id
+
+LEFT JOIN order_items oi
+  ON o.id = oi.order_id
+
+LEFT JOIN payments p
+  ON o.id = p.order_id
+
+GROUP BY
+  o.id,
+  u.first_name,
+  u.last_name,
+  u.email,
+  p.payment_method,
+  p.payment_status,
+  p.transaction_id
+
+ORDER BY o.created_at DESC`,
     );
 
     return rows;

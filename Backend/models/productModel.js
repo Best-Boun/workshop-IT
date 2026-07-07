@@ -5,7 +5,7 @@ class ProductModel {
   static async getAllProducts(filters = {}) {
     const { category, brand } = filters;
 
-    const whereConditions = ["p.status = 'active'"];
+    const whereConditions = [];
     const params = [];
 
     if (category) {
@@ -18,7 +18,10 @@ class ProductModel {
       params.push(brand);
     }
 
-    const whereClause = whereConditions.join(" AND ");
+    const whereClause =
+      whereConditions.length > 0
+        ? `WHERE ${whereConditions.join(" AND ")}`
+        : "";
 
     const [rows] = await pool.query(
       `
@@ -39,9 +42,56 @@ class ProductModel {
       FROM products p
       JOIN categories c
       ON p.category_id = c.id
-      WHERE ${whereClause}
+      ${whereClause}
       ORDER BY p.id DESC
       `,
+      params,
+    );
+
+    return rows;
+  }
+
+  // ดึงสินค้าเฉพาะที่เปิดขาย (สำหรับหน้าร้าน)
+  static async getStoreProducts(filters = {}) {
+    const { category, brand } = filters;
+
+    const whereConditions = ["p.status = 'active'"];
+    const params = [];
+
+    if (category) {
+      whereConditions.push("c.name = ?");
+      params.push(category);
+    }
+
+    if (brand) {
+      whereConditions.push("p.brand = ?");
+      params.push(brand);
+    }
+
+    const whereClause = `WHERE ${whereConditions.join(" AND ")}`;
+
+    const [rows] = await pool.query(
+      `
+    SELECT
+      p.id,
+      p.sku,
+      p.name,
+      p.brand,
+      p.description,
+      p.price,
+      p.stock,
+      p.warranty,
+      p.warranty_provider,
+      p.image,
+      p.featured,
+      p.status,
+      c.name AS category
+    FROM products p
+    JOIN categories c
+      ON p.category_id = c.id
+    ${whereClause}
+    ORDER BY p.id DESC
+    `,
       params,
     );
 
@@ -320,6 +370,20 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
     return rows;
+  }
+
+  // เปลี่ยนสถานะสินค้า
+  static async toggleProductStatus(id, status) {
+    const [result] = await pool.query(
+      `
+    UPDATE products
+    SET status = ?
+    WHERE id = ?
+    `,
+      [status, id],
+    );
+
+    return result;
   }
 }
 

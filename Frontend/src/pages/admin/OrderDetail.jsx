@@ -3,6 +3,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { getOrder, updateOrderStatus } from "../../services/orderService";
 
+const paymentMethodMap = {
+  credit_card: "💳 Credit / Debit Card",
+  promptpay: "📱 PromptPay",
+  bank_transfer: "🏦 Bank Transfer",
+};
+
+const paymentStatusMap = {
+  completed: {
+    text: "Paid",
+    className: "bg-success",
+  },
+  failed: {
+    text: "Failed",
+    className: "bg-danger",
+  },
+  pending: {
+    text: "Pending",
+    className: "bg-warning text-dark",
+  },
+};
+
 const OrderDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -103,6 +124,40 @@ const OrderDetail = () => {
               <p className="mb-1 text-muted">Order Status</p>
               <h5 className="fw-bold">{order.status}</h5>
             </div>
+
+            <div className="col-md-6">
+              <p className="mb-1 text-muted">Payment Method</p>
+              <h5 className="fw-bold">
+                {paymentMethodMap[order.payment?.payment_method] || "-"}
+              </h5>
+            </div>
+
+            <div className="col-md-6">
+              <p className="mb-1 text-muted">Payment Status</p>
+
+              {order.payment ? (
+                <span
+                  className={`badge ${
+                    paymentStatusMap[order.payment.payment_status]?.className ||
+                    "bg-secondary"
+                  }`}
+                >
+                  {paymentStatusMap[order.payment.payment_status]?.text ||
+                    order.payment.payment_status}
+                </span>
+              ) : (
+                <h5>-</h5>
+              )}
+            </div>
+
+            <div className="col-md-6">
+              <p className="mb-1 text-muted">Transaction ID</p>
+
+              <h6 className="fw-bold">
+                {order.payment?.transaction_id || "-"}
+              </h6>
+            </div>
+
             <div className="col-md-6">
               <p className="mb-1 text-muted">Total Price</p>
               <h5 className="fw-bold">
