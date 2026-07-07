@@ -86,8 +86,12 @@ const TrackOrder = () => {
     );
   }
 
-  const currentStep = ORDER_INDEX[order.status] ?? 0;
-
+  const currentStep =
+  ORDER_INDEX[order.status?.toLowerCase()] ?? 0;
+console.log("status =", order.status);
+console.log("status lower =", order.status?.toLowerCase());
+console.log("currentStep =", currentStep);
+console.log("ORDER_INDEX =", ORDER_INDEX);
   return (
     <div className="track-page">
       <Navbar />
@@ -116,7 +120,7 @@ const TrackOrder = () => {
           {/* Timeline */}
           <div className="track-card">
             <div className="section-label">Order Status</div>
-            {order.status === "cancelled" ? (
+            {order.status?.toLowerCase() === "cancelled"? (
               <div className="alert alert-danger rounded-3 mb-0 text-center fw-bold">
                 ❌ This order has been cancelled
               </div>
@@ -206,7 +210,9 @@ const TrackOrder = () => {
           </div>
 
           {/* Cancel */}
-          {["pending", "processing"].includes(order.status) && (
+          {["pending", "processing"].includes(
+  order.status?.toLowerCase()
+) && (
             <div className="text-end mt-2">
               <button
                 className="btn btn-outline-danger rounded-pill"
