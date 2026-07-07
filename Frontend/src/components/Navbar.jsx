@@ -311,17 +311,25 @@ const Navbar = () => {
             ) : (
               <>
                 <li className="nav-item">
+                  <div className="vr d-none d-lg-block mx-2"></div>
+                </li>
+
+                <li className="nav-item">
                   <Link
                     to="/login"
-                    className="btn btn-link text-decoration-none"
+                    className="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold auth-btn auth-outline"
                   >
-                    Login
+                    <i className="bi bi-person me-2"></i>
+                    Sign In
                   </Link>
                 </li>
 
                 <li className="nav-item">
-                  <Link to="/register" className="btn btn-primary btn-sm px-4">
-                    Register
+                  <Link
+                    to="/register"
+                    className="btn btn-primary btn-sm rounded-pill px-4 fw-semibold shadow-sm auth-btn auth-primary"
+                  >
+                    Sign Up
                   </Link>
                 </li>
               </>

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 import api from "../api/axios";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import PasswordInput from "../components/PasswordInput";
 import GoogleButton from "../components/GoogleButton";
 import "../css/Login.css";
+
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -49,7 +51,7 @@ const Login = () => {
       setStatus(null);
 
       const res = await api.post("/auth/login", {
-        email: form.identifier,
+        email: form.identifier.trim(),
         password: form.password,
       });
 
@@ -70,7 +72,9 @@ const Login = () => {
       setTimeout(() => {
         const role = res.data.user.role;
 
-        if (role === "admin") {
+        if (role === "superadmin") {
+          window.location.href = "/superadmin/dashboard";
+        } else if (role === "admin") {
           window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/";
@@ -91,6 +95,13 @@ const Login = () => {
       title="Welcome Back"
       description="Sign in to manage your orders, saved builds, and warranty information."
     >
+      <div className="mb-3">
+        <Link to="/" className="btn btn-outline-secondary rounded-pill px-3">
+          <i className="bi bi-arrow-left me-2"></i>
+          Back to Home
+        </Link>
+      </div>
+
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mb-3">
           <label htmlFor="identifier" className="form-label fw-semibold">
@@ -98,11 +109,25 @@ const Login = () => {
           </label>
           <input
             type="text"
+            autoFocus
+            autoComplete="email"
             className={`form-control form-control-lg rounded-pill shadow-sm ${errors.identifier ? "is-invalid" : ""}`}
             id="identifier"
             placeholder="Enter your Email"
             value={form.identifier}
-            onChange={(e) => setForm({ ...form, identifier: e.target.value })}
+            onChange={(e) => {
+              setForm({
+                ...form,
+                identifier: e.target.value,
+              });
+
+              if (errors.identifier) {
+                setErrors({
+                  ...errors,
+                  identifier: "",
+                });
+              }
+            }}
           />
           <div className="invalid-feedback">{errors.identifier}</div>
         </div>
@@ -110,9 +135,22 @@ const Login = () => {
         <PasswordInput
           label="Password"
           id="password"
+          autoComplete="current-password"
           placeholder="Enter your password"
           value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onChange={(e) => {
+            setForm({
+              ...form,
+              password: e.target.value,
+            });
+
+            if (errors.password) {
+              setErrors({
+                ...errors,
+                password: "",
+              });
+            }
+          }}
           error={errors.password}
         />
 
@@ -129,9 +167,21 @@ const Login = () => {
               Remember me
             </label>
           </div>
-          <a href="#" className="text-primary fw-semibold text-decoration-none">
+          <button
+            type="button"
+            className="btn btn-link p-0 text-decoration-none fw-semibold"
+            onClick={() => {
+              Swal.fire({
+                icon: "info",
+                title: "Coming Soon",
+                text: "Forgot Password feature is currently under development.",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#0d6efd",
+              });
+            }}
+          >
             Forgot password?
-          </a>
+          </button>
         </div>
 
         {status && (
@@ -144,16 +194,30 @@ const Login = () => {
 
         <button
           type="submit"
+          disabled={loading}
           className="btn btn-primary btn-lg w-100 rounded-pill mb-3"
         >
-          {loading ? "Signing in..." : "Login"}
+          <>
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Signing in...
+              </>
+            ) : (
+              "Login"
+            )}
+          </>
         </button>
 
         <div className="divider mb-3">
           <center>OR</center>
         </div>
 
-        <GoogleButton label="Continue with Google" />
+        <GoogleButton label="Continue with Google" disabled={loading} />
       </form>
 
       <div className="text-center text-muted">

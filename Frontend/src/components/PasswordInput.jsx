@@ -8,6 +8,7 @@ const PasswordInput = ({
   onChange,
   error,
   placeholder,
+  autoComplete,
 }) => {
   const [visible, setVisible] = useState(false);
 
@@ -19,28 +20,32 @@ const PasswordInput = ({
 
       <div className="input-group input-group-lg shadow-sm">
         <input
-          type={visible ? "text" : "password"}
-          className={`form-control ${error ? "is-invalid" : ""}`}
           id={id}
           name={name}
+          type={visible ? "text" : "password"}
+          className={`form-control ${error ? "is-invalid" : ""}`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          autoComplete={autoComplete}
         />
 
         <button
           type="button"
           className="btn btn-outline-secondary"
-          onClick={() => setVisible(!visible)}
+          onClick={() => setVisible((prev) => !prev)}
           aria-label={visible ? "Hide password" : "Show password"}
+          title={visible ? "Hide password" : "Show password"}
         >
-          <i
-            className={visible ? "bi bi-eye-slash-fill" : "bi bi-eye-fill"}
-          ></i>
+          {visible ? (
+            <i className="bi bi-eye-fill"></i>
+          ) : (
+            <i className="bi bi-eye-slash-fill"></i>
+          )}
         </button>
-
-        {error && <div className="invalid-feedback">{error}</div>}
       </div>
+
+      {error && <div className="invalid-feedback d-block">{error}</div>}
     </div>
   );
 };

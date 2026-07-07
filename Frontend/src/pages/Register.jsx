@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import api from "../api/axios";
 import AuthLayout from "../components/AuthLayout";
 import GoogleButton from "../components/GoogleButton";
@@ -81,17 +82,27 @@ const Register = () => {
       setLoading(true);
 
       await api.post("/auth/register", {
-        first_name: formState.first_name,
-        last_name: formState.last_name,
-        email: formState.email,
+        first_name: formState.first_name.trim(),
+        last_name: formState.last_name.trim(),
+        email: formState.email.trim(),
         password: formState.password,
       });
 
-      alert("Register successful");
+      await Swal.fire({
+        icon: "success",
+        title: "Account Created!",
+        text: "Your account has been created successfully.",
+        confirmButtonColor: "#0d6efd",
+      });
 
       navigate("/login");
     } catch (error) {
-      alert(error.response?.data?.message || "Register failed");
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error.response?.data?.message || "Register failed",
+        confirmButtonColor: "#dc3545",
+      });
     } finally {
       setLoading(false);
     }
@@ -102,6 +113,13 @@ const Register = () => {
       title="Create your account"
       description="Register once to unlock order tracking, saved builds, and support tools."
     >
+      <div className="mb-3">
+        <Link to="/" className="btn btn-outline-secondary rounded-pill px-3">
+          <i className="bi bi-arrow-left me-2"></i>
+          Back to Home
+        </Link>
+      </div>
+
       <form className="register-form" onSubmit={handleSubmit} noValidate>
         <div className="mb-3">
           <label htmlFor="first_name" className="form-label fw-semibold">
@@ -111,6 +129,8 @@ const Register = () => {
             id="first_name"
             name="first_name"
             type="text"
+            autoFocus
+            autoComplete="given-name"
             className={`form-control form-control-lg rounded-pill shadow-sm ${
               errors.first_name ? "is-invalid" : ""
             }`}
@@ -129,6 +149,7 @@ const Register = () => {
             id="last_name"
             name="last_name"
             type="text"
+            autoComplete="family-name"
             className={`form-control form-control-lg rounded-pill shadow-sm ${
               errors.last_name ? "is-invalid" : ""
             }`}
@@ -147,6 +168,7 @@ const Register = () => {
             id="email"
             name="email"
             type="email"
+            autoComplete="email"
             className={`form-control form-control-lg rounded-pill shadow-sm ${
               errors.email ? "is-invalid" : ""
             }`}
@@ -162,6 +184,7 @@ const Register = () => {
           name="password"
           label="Password"
           placeholder="Create a strong password"
+          autoComplete="new-password"
           value={formState.password}
           onChange={(e) =>
             handleChange({
@@ -179,6 +202,7 @@ const Register = () => {
           name="confirmPassword"
           label="Confirm password"
           placeholder="Repeat your password"
+          autoComplete="new-password"
           value={formState.confirmPassword}
           onChange={(e) =>
             handleChange({
@@ -202,10 +226,21 @@ const Register = () => {
             className="btn btn-primary btn-lg rounded-pill"
             disabled={loading}
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Creating account...
+              </>
+            ) : (
+              "Create account"
+            )}
           </button>
 
-          <GoogleButton label="Continue with Google" />
+          <GoogleButton label="Continue with Google" disabled={loading} />
         </div>
 
         <div className="text-center text-muted">

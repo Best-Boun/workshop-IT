@@ -10,3 +10,13 @@
 .register-page .btn-google {
   border-color: #ced4da;
 }
+
+.back-home{
+    color:#2563eb;
+    transition:.25s;
+}
+
+.back-home:hover{
+    color:#1d4ed8;
+    text-decoration:underline !important;
+}

@@ -1,7 +1,8 @@
 import { GoogleLogin } from "@react-oauth/google";
+import Swal from "sweetalert2";
 import api from "../api/axios";
 
-const GoogleButton = () => {
+const GoogleButton = ({ disabled = false }) => {
   const handleSuccess = async (credentialResponse) => {
     try {
       const res = await api.post("/auth/google", {
@@ -11,22 +12,44 @@ const GoogleButton = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      window.location.href = "/";
-    } catch (err) {
-      console.log(err);
-      console.log(err.response);
-      console.log(err.response?.data);
+      const role = res.data.user.role;
 
-      alert(err.response?.data?.message || "Google Login Failed");
+      if (role === "superadmin") {
+        window.location.href = "/superadmin/dashboard";
+      } else if (role === "admin") {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/";
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Google Sign In Failed",
+        text: err.response?.data?.message || "Unable to sign in with Google.",
+        confirmButtonColor: "#dc3545",
+      });
     }
   };
 
   return (
     <div className="d-flex justify-content-center">
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={() => alert("Google Login Failed")}
-      />
+      {disabled ? (
+        <button className="btn btn-outline-secondary w-100" disabled>
+          Loading...
+        </button>
+      ) : (
+        <GoogleLogin
+          onSuccess={handleSuccess}
+          onError={() =>
+            Swal.fire({
+              icon: "error",
+              title: "Google Sign In Failed",
+              text: "Unable to connect to Google.",
+              confirmButtonColor: "#dc3545",
+            })
+          }
+        />
+      )}
     </div>
   );
 };
