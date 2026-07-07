@@ -4,6 +4,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import {
   registerValidation,
   loginValidation,
+  changePasswordValidation,
 } from "../validations/authValidation.js";
 import validationMiddleware from "../middleware/validationMiddleware.js";
 
@@ -30,5 +31,14 @@ router.post("/google", AuthController.googleLogin);
 
 // Get current user (protected)
 router.get("/me", authMiddleware, AuthController.getMe);
+
+// Change password (protected)
+router.put(
+  "/change-password",
+  authMiddleware,
+  changePasswordValidation,
+  validationMiddleware,
+  AuthController.changePassword,
+);
 
 export default router;

@@ -5,6 +5,25 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/Checkout.css";
 
+const DEFAULT_COUNTRY = "Thailand";
+
+const deriveShippingCity = (address) => {
+  const normalized = String(address || "").trim();
+
+  if (!normalized) return "Thailand";
+
+  const segments = normalized
+    .split(",")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (segments.length >= 2) {
+    return segments[segments.length - 2];
+  }
+
+  return segments[0] || "Thailand";
+};
+
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,13 +33,22 @@ const Checkout = () => {
 
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileError, setProfileError] = useState("");
+  const [shippingProfile, setShippingProfile] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    address: "",
+    country: DEFAULT_COUNTRY,
+  });
 
   const [form, setForm] = useState({
     shipping_address: "",
     shipping_city: "",
     shipping_postal_code: "",
-    shipping_country: "Thailand",
+    shipping_country: DEFAULT_COUNTRY,
   });
 
   useEffect(() => {
@@ -42,13 +70,44 @@ const Checkout = () => {
     if (saved) setCart(JSON.parse(saved));
   }, [isBuyNowFlow, buyNowItem]);
 
+  useEffect(() => {
+    const loadShippingProfile = async () => {
+      try {
+        setProfileLoading(true);
+        setProfileError("");
+
+        const res = await api.get("/users/profile");
+        const profile = res.data?.data || {};
+        const nextAddress = profile.address || "";
+        const nextCountry = DEFAULT_COUNTRY;
+
+        setShippingProfile({
+          first_name: profile.first_name || "",
+          last_name: profile.last_name || "",
+          phone: profile.phone ? String(profile.phone) : "",
+          address: nextAddress,
+          country: nextCountry,
+        });
+
+        setForm((prev) => ({
+          ...prev,
+          shipping_address: nextAddress,
+          shipping_city: deriveShippingCity(nextAddress),
+          shipping_country: nextCountry,
+        }));
+      } catch (err) {
+        setProfileError(err.response?.data?.message || "Failed to load shipping address");
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    loadShippingProfile();
+  }, []);
+
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +115,11 @@ const Checkout = () => {
 
     if (cart.length === 0) {
       setError("Your cart is empty");
+      return;
+    }
+
+    if (!form.shipping_address.trim()) {
+      setError("Please add your shipping address before checkout");
       return;
     }
 
@@ -124,60 +188,81 @@ const Checkout = () => {
                 <div className="checkout-card">
                   <p className="section-heading">Shipping Address</p>
                   <form onSubmit={handleSubmit} id="checkout-form">
-                    <div className="mb-3">
-                      <label className="form-label fw-semibold text-dark">
-                        Address
-                      </label>
-                      <input
-                        className="form-control rounded-3"
-                        name="shipping_address"
-                        placeholder="123 Main Street"
-                        value={form.shipping_address}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-
-                    <div className="row g-3 mb-3">
-                      <div className="col-6">
-                        <label className="form-label fw-semibold text-dark">
-                          City
-                        </label>
-                        <input
-                          className="form-control rounded-3"
-                          name="shipping_city"
-                          placeholder="Bangkok"
-                          value={form.shipping_city}
-                          onChange={handleChange}
-                          required
-                        />
+                    {profileLoading ? (
+                      <div className="d-flex justify-content-center py-5">
+                        <div className="spinner-border text-primary" />
                       </div>
-                      <div className="col-6">
-                        <label className="form-label fw-semibold text-dark">
-                          Postal Code
-                        </label>
-                        <input
-                          className="form-control rounded-3"
-                          name="shipping_postal_code"
-                          placeholder="10110"
-                          value={form.shipping_postal_code}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
+                    ) : profileError ? (
+                      <div className="alert alert-danger rounded-3">{profileError}</div>
+                    ) : form.shipping_address.trim() ? (
+                      <div className="checkout-address-card">
+                        <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                          <div>
+                            <h2 className="h5 fw-bold text-dark mb-1">Shipping Address</h2>
+                            <p className="text-muted mb-0">
+                              Your saved address from My Addresses will be used for this order.
+                            </p>
+                          </div>
 
-                    <div className="mb-3">
-                      <label className="form-label fw-semibold text-dark">
-                        Country
-                      </label>
-                      <input
-                        className="form-control rounded-3"
-                        name="shipping_country"
-                        value={form.shipping_country}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary rounded-pill px-4"
+                            onClick={() => navigate("/my-account/addresses")}
+                          >
+                            Change
+                          </button>
+                        </div>
+
+                        <div className="row g-4">
+                          <div className="col-12 col-md-6">
+                            <div className="small text-uppercase fw-semibold text-muted mb-2 checkout-address-label">
+                              Recipient
+                            </div>
+                            <div className="fw-bold text-dark">
+                              {shippingProfile.first_name} {shippingProfile.last_name}
+                            </div>
+                          </div>
+
+                          <div className="col-12 col-md-6">
+                            <div className="small text-uppercase fw-semibold text-muted mb-2 checkout-address-label">
+                              Phone Number
+                            </div>
+                            <div className="text-dark">{shippingProfile.phone || "-"}</div>
+                          </div>
+
+                          <div className="col-12">
+                            <div className="small text-uppercase fw-semibold text-muted mb-2 checkout-address-label">
+                              Shipping Address
+                            </div>
+                            <div className="text-dark" style={{ whiteSpace: "pre-line" }}>
+                              {shippingProfile.address}
+                            </div>
+                          </div>
+
+                          <div className="col-12">
+                            <div className="small text-uppercase fw-semibold text-muted mb-2 checkout-address-label">
+                              Country
+                            </div>
+                            <div className="text-dark">{shippingProfile.country}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="checkout-address-empty rounded-4">
+                        <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>📍</div>
+                        <h5 className="fw-bold text-dark mb-2">No shipping address found</h5>
+                        <p className="text-muted mb-4">
+                          Add your default shipping address in My Addresses before placing a new order.
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-primary rounded-pill px-4"
+                          onClick={() => navigate("/my-account/addresses")}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    )}
 
                     {error && (
                       <div className="alert alert-danger rounded-3 py-2">

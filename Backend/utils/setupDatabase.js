@@ -45,6 +45,8 @@ export const setupDatabase = async () => {
         user_id INT NOT NULL,
         total_price DECIMAL(10, 2) NOT NULL,
         status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+        shipping_name VARCHAR(255),
+        shipping_phone VARCHAR(20),
         shipping_address VARCHAR(255),
         shipping_city VARCHAR(100),
         shipping_postal_code VARCHAR(20),
@@ -60,6 +62,8 @@ export const setupDatabase = async () => {
 
     // Add shipping columns if they don't exist yet (table pre-existed with old schema)
     const shippingCols = [
+      ["shipping_name",        "VARCHAR(255)"],
+      ["shipping_phone",       "VARCHAR(20)"],
       ["shipping_address",     "VARCHAR(255)"],
       ["shipping_city",        "VARCHAR(100)"],
       ["shipping_postal_code", "VARCHAR(20)"],

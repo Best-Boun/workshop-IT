@@ -35,3 +35,21 @@ export const loginValidation = [
 
   body("password").notEmpty().withMessage("Password is required"),
 ];
+
+export const changePasswordValidation = [
+  body("currentPassword")
+    .notEmpty()
+    .withMessage("Current password is required"),
+
+  body("newPassword")
+    .isLength({ min: 8 })
+    .withMessage("New password must be at least 8 characters")
+    .custom((value, { req }) => value !== req.body.currentPassword)
+    .withMessage("New password must be different from current password"),
+
+  body("confirmPassword")
+    .notEmpty()
+    .withMessage("Please confirm your new password")
+    .custom((value, { req }) => value === req.body.newPassword)
+    .withMessage("Confirm password does not match new password"),
+];

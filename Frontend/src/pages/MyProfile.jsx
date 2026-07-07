@@ -4,7 +4,7 @@ import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const MyProfile = () => {
+const MyProfile = ({ embedded = false }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     first_name: "",
@@ -122,56 +122,34 @@ const MyProfile = () => {
     }
   };
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
-      <Navbar />
-
-      <div
-        style={{
-          background: "linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #0ea5e9 100%)",
-          padding: "3rem 0 2.5rem",
-          color: "#fff",
-        }}
-      >
-        <div className="container">
-          <div
-            style={{
-              textTransform: "uppercase",
-              letterSpacing: "0.14em",
-              fontSize: "0.75rem",
-              color: "rgba(255,255,255,0.72)",
-              marginBottom: "0.35rem",
-            }}
-          >
-            TechPulse · Account
-          </div>
-          <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: "0.25rem" }}>
-            My Profile
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.9rem", marginBottom: 0 }}>
-            Manage your personal information
-          </p>
+  const content = (
+    <>
+      {embedded && (
+        <div className="mb-3">
+          <h2 className="h4 fw-bold mb-1">Personal Information</h2>
+          <p className="text-muted mb-0">Manage your personal information</p>
         </div>
-      </div>
+      )}
 
-      <div className="container py-5" style={{ maxWidth: 900 }}>
+      {!embedded && (
         <button
           className="btn btn-outline-secondary btn-sm rounded-pill mb-4"
           onClick={() => navigate(-1)}
         >
           ← Back
         </button>
+      )}
 
-        {loading ? (
-          <div className="d-flex justify-content-center py-5">
-            <div className="spinner-border text-primary" />
-          </div>
-        ) : error ? (
-          <div className="alert alert-danger rounded-4">{error}</div>
-        ) : (
-          <div className="card border-0 rounded-4 shadow-sm" style={{ border: "1px solid #e2e8f0" }}>
-            <div className="card-body p-4 p-md-5">
-              <form onSubmit={handleSubmit}>
+      {loading ? (
+        <div className="d-flex justify-content-center py-5">
+          <div className="spinner-border text-primary" />
+        </div>
+      ) : error ? (
+        <div className="alert alert-danger rounded-4">{error}</div>
+      ) : (
+        <div className="card border-0 rounded-4 shadow-sm" style={{ border: "1px solid #e2e8f0" }}>
+          <div className="card-body p-4 p-md-5">
+            <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">First Name</label>
@@ -221,36 +199,21 @@ const MyProfile = () => {
                       maxLength={10}
                     />
                   </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Address</label>
-                    <input
-                      type="text"
-                      name="address"
-                      className="form-control rounded-3"
-                      placeholder="Enter your address"
-                      value={form.address}
-                      onChange={handleChange}
-                    />
-                  </div>
                 </div>
 
-                <div className="d-flex justify-content-end mt-4">
-                  <button
-                    type="submit"
-                    className="btn btn-primary rounded-pill px-4 fw-semibold"
-                    disabled={saving}
-                  >
-                    {saving ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="d-flex justify-content-end mt-4">
+                <button
+                  type="submit"
+                  className="btn btn-primary rounded-pill px-4 fw-semibold"
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
-
-      <Footer />
+        </div>
+      )}
 
       {toast && (
         <div
@@ -268,6 +231,50 @@ const MyProfile = () => {
           {toast.message}
         </div>
       )}
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
+      <Navbar />
+
+      <div
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #0ea5e9 100%)",
+          padding: "3rem 0 2.5rem",
+          color: "#fff",
+        }}
+      >
+        <div className="container">
+          <div
+            style={{
+              textTransform: "uppercase",
+              letterSpacing: "0.14em",
+              fontSize: "0.75rem",
+              color: "rgba(255,255,255,0.72)",
+              marginBottom: "0.35rem",
+            }}
+          >
+            TechPulse · Account
+          </div>
+          <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: "0.25rem" }}>
+            My Profile
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.9rem", marginBottom: 0 }}>
+            Manage your personal information
+          </p>
+        </div>
+      </div>
+
+      <div className="container py-5" style={{ maxWidth: 900 }}>
+        {content}
+      </div>
+
+      <Footer />
     </div>
   );
 };

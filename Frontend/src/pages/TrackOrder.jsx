@@ -4,21 +4,21 @@ import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../css/TrackOrder.css";
-
-const STEPS = [
-  { key: "pending",    label: "Pending",    icon: "🕐" },
-  { key: "processing", label: "Processing", icon: "⚙️" },
-  { key: "shipped",    label: "Shipped",    icon: "🚚" },
-  { key: "delivered",  label: "Delivered",  icon: "✅" },
-];
-
-const ORDER_INDEX = {
-  pending: 0,
-  processing: 1,
-  shipped: 2,
-  delivered: 3,
-  cancelled: -1,
-};
+import "../css/OrdersModule.css";
+import OrderStatusBadge from "../components/orders/OrderStatusBadge";
+import PaymentBadge from "../components/orders/PaymentBadge";
+import ShippingTimeline from "../components/orders/ShippingTimeline";
+import ProductRow from "../components/orders/ProductRow";
+import ShippingCard from "../components/orders/ShippingCard";
+import PaymentCard from "../components/orders/PaymentCard";
+import OrderSummaryCard from "../components/orders/OrderSummaryCard";
+import {
+  formatOrderDate,
+  getEstimatedDeliveryLabel,
+  formatCurrency,
+  getPrimaryOrderItem,
+  normalizeStatus,
+} from "../utils/orders";
 
 const TrackOrder = () => {
   const { id } = useParams();
@@ -86,12 +86,36 @@ const TrackOrder = () => {
     );
   }
 
-  const currentStep =
-  ORDER_INDEX[order.status?.toLowerCase()] ?? 0;
-console.log("status =", order.status);
-console.log("status lower =", order.status?.toLowerCase());
-console.log("currentStep =", currentStep);
-console.log("ORDER_INDEX =", ORDER_INDEX);
+  const normalizedStatus = normalizeStatus(order.status);
+  const primaryItem = getPrimaryOrderItem(order.items);
+
+  const handleProductNavigation = (item = primaryItem) => {
+    if (item?.product_id) {
+      navigate(`/products/${item.product_id}`);
+      return;
+    }
+
+    navigate("/products");
+  };
+
+  const handleContactSupport = () => {
+    window.location.href = "/#contact";
+  };
+
+  const handleTrackPackage = () => {
+    const section = document.getElementById("shipment-status-card");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const canCancel = ["pending", "processing"].includes(normalizedStatus);
+  const trackingNumber = order.tracking_number || order.tracking_code || "";
+
+  const handleDownloadInvoice = () => {
+    window.print();
+  };
+
   return (
     <div className="track-page">
       <Navbar />
@@ -102,14 +126,13 @@ console.log("ORDER_INDEX =", ORDER_INDEX);
           <div className="track-hero-label">TechPulse · Order Tracking</div>
           <h1>Order #{order.id}</h1>
           <p className="mb-0 mt-1" style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.9rem" }}>
-            {new Date(order.created_at).toLocaleString("th-TH")}
+            {formatOrderDate(order.created_at)}
           </p>
         </div>
       </div>
 
       <div className="track-main">
-        <div className="container" style={{ maxWidth: 760 }}>
-          {/* Back button */}
+        <div className="container track-order-shell" style={{ maxWidth: 1080 }}>
           <button
             className="btn btn-outline-secondary btn-sm rounded-pill mb-4"
             onClick={() => navigate("/orders")}
@@ -117,112 +140,169 @@ console.log("ORDER_INDEX =", ORDER_INDEX);
             ← Back to Orders
           </button>
 
-          {/* Timeline */}
-          <div className="track-card">
-            <div className="section-label">Order Status</div>
-            {order.status?.toLowerCase() === "cancelled"? (
-              <div className="alert alert-danger rounded-3 mb-0 text-center fw-bold">
-                ❌ This order has been cancelled
-              </div>
-            ) : (
-              <div className="timeline">
-                {STEPS.map((step, idx) => {
-                  const isDone = idx < currentStep;
-                  const isActive = idx === currentStep;
-                  return (
-                    <div className="timeline-step" key={step.key}>
-                      <div
-                        className={`timeline-circle ${isDone ? "done" : ""} ${isActive ? "active" : ""}`}
-                      >
-                        {isDone ? "✓" : step.icon}
-                      </div>
-                      <div className={`timeline-label ${isActive ? "active" : ""}`}>
-                        {step.label}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Order Items */}
-          <div className="track-card">
-            <div className="section-label">Items</div>
-            {order.items?.map((item) => (
-              <div className="track-item-row" key={item.id}>
-                <img
-                  src={item.image ? `http://localhost:5000/uploads/${item.image}` : null}
-                  alt={item.name}
-                  className="track-item-img"
-                  onError={(e) => { e.target.style.display = "none"; }}
-                />
-                <div className="flex-grow-1">
-                  <div className="fw-semibold text-dark">{item.name}</div>
-                  <div className="text-muted small">{item.brand} · Qty {item.quantity}</div>
+          <div className="tp-detail-section">
+            <div className="tp-detail-card track-order-header-card">
+              <div className="track-order-header-card__primary">
+                <div>
+                  <div className="track-order-overline">Order Detail</div>
+                  <div className="track-order-title-row">
+                    <h2 className="track-order-title mb-0">Order #{order.id}</h2>
+                    <OrderStatusBadge status={order.status} />
+                  </div>
                 </div>
-                <div className="fw-bold text-primary">
-                  ฿{(item.price * item.quantity).toLocaleString()}
+                <div className="track-order-inline-meta">
+                  <div>
+                    <div className="tp-detail-label">Placed On</div>
+                    <div className="tp-detail-value">{formatOrderDate(order.created_at)}</div>
+                  </div>
+                  <div>
+                    <div className="tp-detail-label">Total Amount</div>
+                    <div className="track-order-total">{formatCurrency(order.total_amount)}</div>
+                  </div>
                 </div>
               </div>
-            ))}
-            <div className="mt-3 pt-3 border-top d-flex justify-content-between fw-bold">
-              <span>Total</span>
-              <span className="text-primary">฿{Number(order.total_amount).toLocaleString()}</span>
             </div>
           </div>
 
-          {/* Shipping & Payment */}
-          <div className="row g-3">
-            <div className="col-md-6">
-              <div className="track-card">
-                <div className="section-label">Shipping Address</div>
-                <div className="info-row"><span>Address</span><span>{order.shipping_address}</span></div>
-                <div className="info-row"><span>City</span><span>{order.shipping_city}</span></div>
-                <div className="info-row"><span>Postal</span><span>{order.shipping_postal_code || "—"}</span></div>
-                <div className="info-row"><span>Country</span><span>{order.shipping_country}</span></div>
+          <div className="tp-detail-section">
+            <div className="tp-detail-card track-shipment-hero" id="shipment-status-card">
+              <div className="track-shipment-hero__top">
+                <div>
+                  <div className="tp-detail-card__title mb-2">Shipment Status</div>
+                  <div className="track-shipment-hero__headline">Track your shipment progress</div>
+                  <div className="track-shipment-hero__subtext">
+                    Stay updated with the latest delivery milestone for this order.
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-outline-primary rounded-pill px-4"
+                  onClick={handleTrackPackage}
+                  disabled={["pending", "processing", "cancelled"].includes(normalizedStatus)}
+                >
+                  Track Package
+                </button>
               </div>
-            </div>
-            <div className="col-md-6">
-              <div className="track-card">
-                <div className="section-label">Payment</div>
-                {order.payment ? (
-                  <>
-                    <div className="info-row"><span>Method</span><span>{order.payment.payment_method}</span></div>
-                    <div className="info-row">
-                      <span>Status</span>
-                      <span className={`fw-bold ${order.payment.status === "completed" ? "text-success" : "text-danger"}`}>
-                        {order.payment.status}
-                      </span>
-                    </div>
-                    <div className="info-row">
-                      <span>Txn ID</span>
-                      <span className="small text-muted" style={{ wordBreak: "break-all" }}>
-                        {order.payment.transaction_id}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-muted small">No payment record</div>
+
+              <div className="track-shipment-hero__meta">
+                <div className="track-shipment-hero__meta-card">
+                  <div className="tp-detail-label">Current Status</div>
+                  <div className="tp-detail-value"><OrderStatusBadge status={order.status} /></div>
+                </div>
+                <div className="track-shipment-hero__meta-card">
+                  <div className="tp-detail-label">Estimated Delivery</div>
+                  <div className="tp-detail-value">{getEstimatedDeliveryLabel(order.status)}</div>
+                </div>
+                {trackingNumber && (
+                  <div className="track-shipment-hero__meta-card">
+                    <div className="tp-detail-label">Tracking Number</div>
+                    <div className="tp-detail-value tp-detail-value--wrap">{trackingNumber}</div>
+                  </div>
                 )}
+                <div className="track-shipment-hero__meta-card">
+                  <div className="tp-detail-label">Payment Status</div>
+                  <div className="tp-detail-value">
+                    <PaymentBadge
+                      status={order.payment?.status || order.payment_status}
+                      method={order.payment?.payment_method || order.payment_method}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="track-shipment-hero__timeline">
+                <ShippingTimeline status={order.status} />
               </div>
             </div>
           </div>
 
-          {/* Cancel */}
-          {["pending", "processing"].includes(
-  order.status?.toLowerCase()
-) && (
-            <div className="text-end mt-2">
-              <button
-                className="btn btn-outline-danger rounded-pill"
-                onClick={handleCancel}
-                disabled={cancelling}
-              >
-                {cancelling ? "Cancelling..." : "Cancel Order"}
-              </button>
+          <div className="tp-detail-section">
+            <div className="tp-detail-card tp-products-card track-products-card">
+              <div className="tp-detail-card__title">Purchased Products</div>
+              <div className="tp-products-card__cols">
+                <span>Product</span>
+                <span>Quantity</span>
+                <span>Unit Price</span>
+                <span className="text-end">Subtotal</span>
+              </div>
+              {(order.items || []).map((item) => (
+                <ProductRow
+                  key={item.id}
+                  item={item}
+                  onOpen={() => handleProductNavigation(item)}
+                />
+              ))}
             </div>
-          )}
+          </div>
+
+          <div className="tp-detail-section row g-3 track-bottom-grid">
+            <div className="col-lg-6">
+              <ShippingCard order={order} />
+            </div>
+            <div className="col-lg-6">
+              <PaymentCard payment={order.payment} />
+            </div>
+          </div>
+
+          <div className="tp-detail-section row g-3">
+            <div className="col-lg-6 ms-lg-auto">
+              <OrderSummaryCard order={order} />
+            </div>
+          </div>
+
+          <div className="tp-detail-section">
+            <div className="tp-detail-card track-footer-actions-card">
+              <div className="track-footer-actions-layout">
+                <div className="track-footer-help">
+                  <div className="track-footer-help__title">Need help with your order?</div>
+                  <button
+                    type="button"
+                    className="btn btn-link text-decoration-none px-0 track-footer-actions__text"
+                    onClick={handleContactSupport}
+                  >
+                    <span aria-hidden="true">⌁</span>
+                    <span>Contact Support</span>
+                  </button>
+                </div>
+
+                <div className="track-footer-actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary rounded-pill px-4 track-footer-actions__btn"
+                    onClick={() => handleProductNavigation()}
+                  >
+                    Buy Again
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary rounded-pill px-4 track-footer-actions__btn"
+                    onClick={handleDownloadInvoice}
+                  >
+                    Download Invoice
+                  </button>
+                  {canCancel && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger rounded-pill px-4 track-footer-actions__btn"
+                      onClick={handleCancel}
+                      disabled={cancelling}
+                    >
+                      {cancelling ? "Cancelling..." : "Cancel Order"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-link text-decoration-none px-0 track-footer-actions__text track-footer-actions__text--mobile"
+                    onClick={handleContactSupport}
+                  >
+                    <span aria-hidden="true">⌁</span>
+                    <span>Contact Support</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

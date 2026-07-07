@@ -124,6 +124,35 @@ class AuthService {
       },
     };
   }
+
+  static async changePassword(userId, payload) {
+    const { currentPassword, newPassword } = payload;
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.password) {
+      throw new Error("Password update is unavailable for this account");
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      throw new Error("Current password is incorrect");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const affectedRows = await UserModel.updatePasswordById(userId, hashedPassword);
+
+    if (!affectedRows) {
+      throw new Error("Failed to update password");
+    }
+
+    return true;
+  }
 }
 
 export default AuthService;

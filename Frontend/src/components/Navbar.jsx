@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
+import { clearAuthSession } from "../utils/authSession";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -57,11 +58,7 @@ const Navbar = () => {
   }, [searchTerm, navigate, location.pathname, location.search]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
+    clearAuthSession();
 
     window.location.href = "/login";
   };
@@ -250,14 +247,6 @@ const Navbar = () => {
                     </div>
 
                     <Link
-                      to="/profile"
-                      className="dropdown-item"
-                      onClick={() => setOpen(false)}
-                    >
-                      👤 My Profile
-                    </Link>
-
-                    <Link
                       to="/orders"
                       className="dropdown-item"
                       onClick={() => setOpen(false)}
@@ -266,11 +255,11 @@ const Navbar = () => {
                     </Link>
 
                     <Link
-                      to="/settings"
+                      to="/my-account"
                       className="dropdown-item"
                       onClick={() => setOpen(false)}
                     >
-                      ⚙️ Settings
+                      ⚙️ My Account
                     </Link>
 
                     {(user.role === "admin" || user.role === "superadmin") && (

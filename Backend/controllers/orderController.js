@@ -1,5 +1,6 @@
 import OrderModel from "../models/orderModel.js";
 import PaymentModel from "../models/paymentModel.js";
+import UserModel from "../models/userModel.js";
 
 class OrderController {
   // ==========================
@@ -31,9 +32,23 @@ class OrderController {
           .json({ success: false, message: "Shipping address is required" });
       }
 
+      const profile = await UserModel.getProfileById(userId);
+
+      if (!profile) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      const shipping_name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
+      const shipping_phone = profile.phone ? String(profile.phone) : null;
+      const shipping_address_snapshot = profile.address || shipping_address;
+
       const orderId = await OrderModel.createOrder(userId, {
         items,
-        shipping_address,
+        shipping_name,
+        shipping_phone,
+        shipping_address: shipping_address_snapshot,
         shipping_city,
         shipping_postal_code,
         shipping_country,

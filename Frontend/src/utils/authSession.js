@@ -1,0 +1,7 @@
+export const clearAuthSession = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+};

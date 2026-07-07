@@ -68,6 +68,19 @@ class UserModel {
     return result.affectedRows;
   }
 
+  static async updatePasswordById(id, hashedPassword) {
+    const [result] = await pool.execute(
+      `UPDATE users
+       SET
+         password = ?,
+         updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [hashedPassword, id],
+    );
+
+    return result.affectedRows;
+  }
+
   // ดึง admins และ superadmins
   static async getAdmins() {
     const [rows] = await pool.execute(

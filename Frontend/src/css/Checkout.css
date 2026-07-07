@@ -97,3 +97,21 @@
   padding: 4rem 2rem;
   color: #94a3b8;
 }
+
+.checkout-address-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+}
+
+.checkout-address-label {
+  letter-spacing: 0.08em;
+}
+
+.checkout-address-empty {
+  text-align: center;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  padding: 3rem 1.5rem;
+}

@@ -93,6 +93,22 @@ class AuthController {
       return res.status(500).json({ success: false, message: "Server error" });
     }
   }
+
+  static async changePassword(req, res) {
+    try {
+      await AuthService.changePassword(req.user.id, req.body);
+
+      return res.status(200).json({
+        success: true,
+        message: "Password updated successfully",
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 export default AuthController;

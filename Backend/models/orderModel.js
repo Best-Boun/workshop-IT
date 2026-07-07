@@ -7,6 +7,8 @@ class OrderModel {
     userId,
     {
       items,
+      shipping_name,
+      shipping_phone,
       shipping_address,
       shipping_city,
       shipping_postal_code,
@@ -21,11 +23,13 @@ class OrderModel {
 
       const [orderResult] = await conn.execute(
         `INSERT INTO orders
-          (user_id, total_price, shipping_address, shipping_city, shipping_postal_code, shipping_country)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+          (user_id, total_price, shipping_name, shipping_phone, shipping_address, shipping_city, shipping_postal_code, shipping_country)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           userId,
           total_amount,
+          shipping_name,
+          shipping_phone,
           shipping_address,
           shipping_city,
           shipping_postal_code,

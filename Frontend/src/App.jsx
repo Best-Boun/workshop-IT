@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -12,6 +12,11 @@ import OrderHistory from "./pages/OrderHistory";
 import TrackOrder from "./pages/TrackOrder";
 import OrderManagement from "./pages/OrderManagement";
 import MyProfile from "./pages/MyProfile";
+import MyAccount from "./pages/MyAccount";
+import AccountPlaceholder from "./pages/account/AccountPlaceholder";
+import LoginSecurity from "./pages/account/LoginSecurity";
+import MyAddresses from "./pages/account/MyAddresses";
+import PaymentMethodsPanel from "./pages/account/PaymentMethodsPanel";
 
 import {
   PrivateRoute,
@@ -97,6 +102,111 @@ function App() {
           element={
             <PrivateRoute>
               <MyProfile />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/my-account"
+          element={
+            <PrivateRoute>
+              <MyAccount />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<Navigate to="personal-information" replace />} />
+          <Route path="personal-information" element={<MyProfile embedded />} />
+          <Route
+            path="addresses"
+            element={<MyAddresses />}
+          />
+          <Route
+            path="payment-methods"
+            element={<PaymentMethodsPanel />}
+          />
+          <Route path="login-security" element={<LoginSecurity embedded />} />
+        </Route>
+
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Navigate to="/my-account" replace />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/wishlist"
+          element={
+            <PrivateRoute>
+              <AccountPlaceholder
+                title="Wishlist"
+                description="Save products you love and revisit them later. Wishlist management is planned for a future release and will support seamless sync across devices."
+              />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/returns-refunds"
+          element={
+            <PrivateRoute>
+              <AccountPlaceholder
+                title="Returns & Refunds"
+                description="Track return requests and refund statuses in one place. This module is planned for an upcoming release with full order-level integration."
+              />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/addresses"
+          element={
+            <PrivateRoute>
+              <Navigate to="/my-account/addresses" replace />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/payment-methods"
+          element={
+            <PrivateRoute>
+              <Navigate to="/my-account/payment-methods" replace />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/login-security"
+          element={
+            <PrivateRoute>
+              <Navigate to="/my-account/login-security" replace />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/help-centre"
+          element={
+            <PrivateRoute>
+              <AccountPlaceholder
+                title="Help Centre"
+                description="Find account and order support resources quickly. A full support centre with searchable content is planned for an upcoming release."
+              />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/account/about-techpulse"
+          element={
+            <PrivateRoute>
+              <AccountPlaceholder
+                title="About TechPulse"
+                description="Learn more about our mission, product quality standards, and customer-first service approach. Expanded company information is planned for a future release."
+              />
             </PrivateRoute>
           }
         />
