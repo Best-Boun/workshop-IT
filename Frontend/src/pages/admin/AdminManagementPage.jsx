@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
+import "./AdminManagementPage.css";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 const defaultPermissions = {
   dashboard: { view: false, manage: false },
@@ -67,6 +69,11 @@ const normalizePermissions = (permissions) => {
 };
 
 const AdminManagementPage = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageAdminManagement = canAccessPage(user, "adminManagement", "manage");
+
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,6 +105,8 @@ const AdminManagementPage = () => {
   }, []);
 
   const handleTogglePermission = async (adminId, pageKey, permissionType) => {
+    if (!canManageAdminManagement) return;
+
     try {
       setUpdating(adminId);
       const admin = admins.find((item) => item.id === adminId);
@@ -149,6 +158,8 @@ const AdminManagementPage = () => {
   };
 
   const handleDeleteAdmin = async (adminId) => {
+    if (!canManageAdminManagement) return;
+
     if (!window.confirm("ยืนยันการลบแอดมินคนนี้?")) return;
 
     try {
@@ -163,11 +174,11 @@ const AdminManagementPage = () => {
   };
 
   return (
-    <div>
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
+    <div className="container-fluid admin-management-page">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4 gap-3">
         <div>
-          <h3>จัดการแอดมินย่อย</h3>
-          <p className="text-muted">ดูข้อมูลแอดมิน ลบ และอนุมัติสิทธิ์การเข้าถึงฟังก์ชันต่างๆ</p>
+          <h4 className="fw-bold mb-1">จัดการแอดมินย่อย</h4>
+          <p className="text-muted mb-0">ดูข้อมูลแอดมิน ลบ และอนุมัติสิทธิ์การเข้าถึงฟังก์ชันต่างๆ</p>
         </div>
       </div>
 
@@ -175,97 +186,110 @@ const AdminManagementPage = () => {
         <div className="alert alert-danger rounded-4">{error}</div>
       )}
 
-      <div className="mb-4">
+      <div className="mb-4 d-flex justify-content-end">
         <button className="btn btn-outline-primary" onClick={fetchAdmins} disabled={loading}>
           {loading ? "กำลังโหลด..." : "รีเฟรชข้อมูล"}
         </button>
       </div>
 
-      <div className="table-responsive">
-        <table className="table table-dark table-striped align-middle rounded shadow-sm bg-dark">
-          <thead>
-            <tr>
-              <th>ชื่อ</th>
-              <th>อีเมล</th>
-              <th>บทบาท</th>
-              <th>สิทธิ์การใช้งาน</th>
-              <th>จัดการ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => {
-              const permissions = normalizePermissions(admin.permissions);
-
-              return (
-                <tr key={admin.id}>
-                  <td>{admin.first_name} {admin.last_name}</td>
-                  <td>{admin.email}</td>
-                  <td>{admin.role}</td>
-                  <td>
-                    <div className="d-flex flex-column gap-2">
-                      {permissionPages.map((permissionPage) => (
-                        <div
-                          key={`${admin.id}-${permissionPage.key}`}
-                          className="border rounded p-2"
-                        >
-                          <div className="fw-semibold mb-1">{permissionPage.label}</div>
-                          <div className="d-flex flex-wrap gap-3">
-                            <div className="form-check mb-0">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={`${admin.id}-${permissionPage.key}-view`}
-                                checked={permissions[permissionPage.key]?.view || false}
-                                disabled={updating === admin.id || admin.role === "superadmin"}
-                                onChange={() =>
-                                  handleTogglePermission(admin.id, permissionPage.key, "view")
-                                }
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`${admin.id}-${permissionPage.key}-view`}
-                              >
-                                มองเห็น
-                              </label>
-                            </div>
-
-                            <div className="form-check mb-0">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id={`${admin.id}-${permissionPage.key}-manage`}
-                                checked={permissions[permissionPage.key]?.manage || false}
-                                disabled={updating === admin.id || admin.role === "superadmin"}
-                                onChange={() =>
-                                  handleTogglePermission(admin.id, permissionPage.key, "manage")
-                                }
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`${admin.id}-${permissionPage.key}-manage`}
-                              >
-                                จัดการ
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      disabled={updating === admin.id || admin.role === "superadmin"}
-                      onClick={() => handleDeleteAdmin(admin.id)}
-                    >
-                      ลบ
-                    </button>
-                  </td>
+      <div className="card shadow-sm border-0 admin-management-card">
+        <div className="card-body p-0">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0 admin-management-table">
+              <thead className="table-light">
+                <tr>
+                  <th>ชื่อ</th>
+                  <th>อีเมล</th>
+                  <th>บทบาท</th>
+                  <th>สิทธิ์การใช้งาน</th>
+                  <th className="text-center">จัดการ</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {admins.map((admin) => {
+                  const isSuperAdmin = admin.role === "superadmin";
+                  const permissions = normalizePermissions(admin.permissions);
+
+                  return (
+                    <tr key={admin.id}>
+                      <td className="fw-semibold">{admin.first_name} {admin.last_name}</td>
+                      <td>{admin.email}</td>
+                      <td>
+                        <span className={`badge admin-role-badge ${admin.role === "superadmin" ? "role-superadmin" : "role-admin"}`}>
+                          {admin.role}
+                        </span>
+                      </td>
+                      <td>
+                        {isSuperAdmin ? (
+                          <span className="superadmin-permission-note">สิทธิ์ทั้งหมด (Superadmin)</span>
+                        ) : (
+                          <div className="d-flex flex-column gap-2">
+                            {permissionPages.map((permissionPage) => (
+                              <div
+                                key={`${admin.id}-${permissionPage.key}`}
+                                className="permission-item"
+                              >
+                                <div className="fw-semibold mb-1 small">{permissionPage.label}</div>
+                                <div className="d-flex flex-wrap gap-3">
+                                  <div className="form-check mb-0">
+                                    <input
+                                      className="form-check-input"
+                                      type="checkbox"
+                                      id={`${admin.id}-${permissionPage.key}-view`}
+                                      checked={permissions[permissionPage.key]?.view || false}
+                                      disabled={updating === admin.id || !canManageAdminManagement}
+                                      onChange={() =>
+                                        handleTogglePermission(admin.id, permissionPage.key, "view")
+                                      }
+                                    />
+                                    <label
+                                      className="form-check-label"
+                                      htmlFor={`${admin.id}-${permissionPage.key}-view`}
+                                    >
+                                      มองเห็น
+                                    </label>
+                                  </div>
+
+                                  <div className="form-check mb-0">
+                                    <input
+                                      className="form-check-input"
+                                      type="checkbox"
+                                      id={`${admin.id}-${permissionPage.key}-manage`}
+                                      checked={permissions[permissionPage.key]?.manage || false}
+                                      disabled={updating === admin.id || !canManageAdminManagement}
+                                      onChange={() =>
+                                        handleTogglePermission(admin.id, permissionPage.key, "manage")
+                                      }
+                                    />
+                                    <label
+                                      className="form-check-label"
+                                      htmlFor={`${admin.id}-${permissionPage.key}-manage`}
+                                    >
+                                      จัดการ
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="text-center">
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          disabled={updating === admin.id || isSuperAdmin || !canManageAdminManagement}
+                          onClick={() => handleDeleteAdmin(admin.id)}
+                        >
+                          ลบ
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

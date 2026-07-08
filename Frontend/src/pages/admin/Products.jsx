@@ -8,8 +8,14 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 const Products = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageProducts = canAccessPage(user, "products", "manage");
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
@@ -39,6 +45,8 @@ const fetchCategories = async () => {
 
   
 const handleDelete = async (id) => {
+ if (!canManageProducts) return;
+
  const result = await Swal.fire({
    title: "Delete Product?",
    text: "You won't be able to recover this product.",
@@ -77,6 +85,8 @@ const handleDelete = async (id) => {
 };
 
 const handleToggleStatus = async (product) => {
+  if (!canManageProducts) return;
+
   const newStatus = product.status === "active" ? "inactive" : "active";
 
   const result = await Swal.fire({
@@ -161,9 +171,15 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
           <p className="text-muted mb-0">Manage your products</p>
         </div>
 
-        <Link to="/admin/products/add" className="btn btn-primary">
-          + Add Product
-        </Link>
+        {canManageProducts ? (
+          <Link to="/admin/products/add" className="btn btn-primary">
+            + Add Product
+          </Link>
+        ) : (
+          <button type="button" className="btn btn-secondary" disabled>
+            + Add Product
+          </button>
+        )}
       </div>
 
       {/* Search & Filter */}
@@ -294,9 +310,9 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
                               ? "bg-success"
                               : "bg-secondary"
                           }`}
-                          role="button"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleToggleStatus(product)}
+                          role={canManageProducts ? "button" : undefined}
+                          style={{ cursor: canManageProducts ? "pointer" : "not-allowed", opacity: canManageProducts ? 1 : 0.75 }}
+                          onClick={canManageProducts ? () => handleToggleStatus(product) : undefined}
                         >
                           {product.status === "active" ? "Active" : "Inactive"}
                         </span>
@@ -304,17 +320,29 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
                       {/* Action */}
                       <td className="text-center">
-                        <Link
-                          to={`/admin/products/edit/${product.id}`}
-                          className="btn btn-sm btn-outline-primary me-2"
-                          title="Edit"
-                        >
-                          <Pencil size={16} />
-                        </Link>
+                        {canManageProducts ? (
+                          <Link
+                            to={`/admin/products/edit/${product.id}`}
+                            className="btn btn-sm btn-outline-primary me-2"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary me-2"
+                            title="No manage permission"
+                            disabled
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        )}
 
                         <button
                           className="btn btn-sm btn-outline-danger"
                           title="Delete"
+                          disabled={!canManageProducts}
                           onClick={() => handleDelete(product.id)}
                         >
                           <Trash2 size={16} />

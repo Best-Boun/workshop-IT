@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -21,6 +21,7 @@ import PaymentMethodsPanel from "./pages/account/PaymentMethodsPanel";
 import {
   PrivateRoute,
   AdminRoute,
+  AdminPageRoute,
 } from "./components/PrivateRoute";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -45,6 +46,13 @@ import CustomerDetail from "./pages/admin/CustomerDetail";
 import Reports from "./pages/admin/Reports";
 import LogSecurityPage from "./pages/admin/LogSecurityPage";
 import AdminManagementPage from "./pages/admin/AdminManagementPage";
+
+const SuperadminRedirect = () => {
+  const location = useLocation();
+  const targetPath = location.pathname.replace(/^\/superadmin/, "/admin") || "/admin/dashboard";
+
+  return <Navigate to={`${targetPath}${location.search}${location.hash}`} replace />;
+};
 
 function App() {
   return (
@@ -220,36 +228,137 @@ function App() {
             </AdminRoute>
           }
         >
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="dashboard"
+            element={
+              <AdminPageRoute pageKey="dashboard">
+                <Dashboard />
+              </AdminPageRoute>
+            }
+          />
 
-          <Route path="products" element={<ProductsAdmin />} />
-          <Route path="products/add" element={<AddProduct />} />
-          <Route path="products/edit/:id" element={<EditProduct />} />
+          <Route
+            path="products"
+            element={
+              <AdminPageRoute pageKey="products">
+                <ProductsAdmin />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="products/add"
+            element={
+              <AdminPageRoute pageKey="products" mode="manage">
+                <AddProduct />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="products/edit/:id"
+            element={
+              <AdminPageRoute pageKey="products" mode="manage">
+                <EditProduct />
+              </AdminPageRoute>
+            }
+          />
 
-          <Route path="categories" element={<Categories />} />
-          <Route path="categories/add" element={<AddCategory />} />
-          <Route path="categories/edit/:id" element={<EditCategory />} />
+          <Route
+            path="categories"
+            element={
+              <AdminPageRoute pageKey="categories">
+                <Categories />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="categories/add"
+            element={
+              <AdminPageRoute pageKey="categories" mode="manage">
+                <AddCategory />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="categories/edit/:id"
+            element={
+              <AdminPageRoute pageKey="categories" mode="manage">
+                <EditCategory />
+              </AdminPageRoute>
+            }
+          />
 
-          <Route path="orders" element={<Orders />} />
-          <Route path="orders/:id" element={<OrderDetail />} />
+          <Route
+            path="orders"
+            element={
+              <AdminPageRoute pageKey="orders">
+                <Orders />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="orders/:id"
+            element={
+              <AdminPageRoute pageKey="orders" mode="manage">
+                <OrderDetail />
+              </AdminPageRoute>
+            }
+          />
 
-          <Route path="customers" element={<Customers />} />
-          <Route path="customers/:id" element={<CustomerDetail />} />
+          <Route
+            path="customers"
+            element={
+              <AdminPageRoute pageKey="customers">
+                <Customers />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="customers/:id"
+            element={
+              <AdminPageRoute pageKey="customers" mode="manage">
+                <CustomerDetail />
+              </AdminPageRoute>
+            }
+          />
 
-          <Route path="reports" element={<Reports />} />
-          <Route path="admin-management" element={<AdminManagementPage />} />
-          <Route path="logs-security" element={<LogSecurityPage />} />
+          <Route
+            path="reports"
+            element={
+              <AdminPageRoute pageKey="reports">
+                <Reports />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="admin-management"
+            element={
+              <AdminPageRoute pageKey="adminManagement">
+                <AdminManagementPage />
+              </AdminPageRoute>
+            }
+          />
+          <Route
+            path="logs-security"
+            element={
+              <AdminPageRoute pageKey="logsSecurity">
+                <LogSecurityPage />
+              </AdminPageRoute>
+            }
+          />
         </Route>
 
         {/* Route เดิมของเพื่อน */}
         <Route
           path="/admin/orders"
           element={
-            <AdminRoute>
+            <AdminPageRoute pageKey="orders" mode="manage">
               <OrderManagement />
-            </AdminRoute>
+            </AdminPageRoute>
           }
         />
+
+        {/* Backward compatibility for legacy superadmin paths */}
+        <Route path="/superadmin/*" element={<SuperadminRedirect />} />
       </Routes>
     </>
   );

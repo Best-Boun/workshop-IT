@@ -6,8 +6,14 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 const Categories = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageCategories = canAccessPage(user, "categories", "manage");
+
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,6 +29,8 @@ const Categories = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManageCategories) return;
+
     const result = await Swal.fire({
       title: "Delete Category?",
       text: "You won't be able to recover this category.",
@@ -92,9 +100,15 @@ const Categories = () => {
           <p className="text-muted mb-0">Manage your categories</p>
         </div>
 
-        <Link to="/admin/categories/add" className="btn btn-primary">
-          + Add Category
-        </Link>
+        {canManageCategories ? (
+          <Link to="/admin/categories/add" className="btn btn-primary">
+            + Add Category
+          </Link>
+        ) : (
+          <button type="button" className="btn btn-secondary" disabled>
+            + Add Category
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -174,17 +188,29 @@ const Categories = () => {
 
                       {/* Action */}
                       <td className="text-center">
-                        <Link
-                          to={`/admin/categories/edit/${category.id}`}
-                          className="btn btn-sm btn-outline-primary me-2"
-                          title="Edit"
-                        >
-                          <Pencil size={16} />
-                        </Link>
+                        {canManageCategories ? (
+                          <Link
+                            to={`/admin/categories/edit/${category.id}`}
+                            className="btn btn-sm btn-outline-primary me-2"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary me-2"
+                            title="No manage permission"
+                            disabled
+                          >
+                            <Pencil size={16} />
+                          </button>
+                        )}
 
                         <button
                           className="btn btn-sm btn-outline-danger"
                           title="Delete"
+                          disabled={!canManageCategories}
                           onClick={() => handleDelete(category.id)}
                         >
                           <Trash2 size={16} />

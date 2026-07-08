@@ -6,6 +6,7 @@ import {
   getOrderStatusReport,
   getPaymentAnalytics,
 } from "../../services/reportService";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 // Temporary hardcoded data until real APIs are available.
 // Replace these with live data once backend endpoints are ready.
@@ -57,6 +58,11 @@ const ProgressRow = ({ icon, label, value, pct, color }) => (
 );
 
 const Reports = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageReports = canAccessPage(user, "reports", "manage");
+
   const [summary, setSummary] = useState(null);
   const [sales, setSales] = useState([]);
   const [products, setProducts] = useState([]);
@@ -160,6 +166,8 @@ const Reports = () => {
   // Client-side CSV export built from data already loaded on this page.
   // Swap this out for a backend export endpoint whenever one exists.
   const handleExportCSV = () => {
+    if (!canManageReports) return;
+
     const rows = [
       ["Month", "Revenue", "Orders"],
       ...sales.map((item) => [
@@ -183,6 +191,8 @@ const Reports = () => {
 
   // PDF export backend isn't ready yet - UI only for now.
   const handleExportPDF = () => {
+    if (!canManageReports) return;
+
     alert("PDF export is coming soon.");
   };
 
@@ -198,6 +208,7 @@ const Reports = () => {
           <button
             type="button"
             className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+            disabled={!canManageReports}
             onClick={handleExportCSV}
           >
             <i className="bi bi-file-earmark-spreadsheet" />
@@ -206,6 +217,7 @@ const Reports = () => {
           <button
             type="button"
             className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+            disabled={!canManageReports}
             onClick={handleExportPDF}
           >
             <i className="bi bi-file-earmark-pdf" />

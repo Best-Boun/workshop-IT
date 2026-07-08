@@ -3,8 +3,14 @@ import { getAllOrders, deleteOrder } from "../../services/orderService";
 import { Eye, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 const Orders = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageOrders = canAccessPage(user, "orders", "manage");
+
   const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -21,6 +27,8 @@ const Orders = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManageOrders) return;
+
     const result = await Swal.fire({
       title: "Delete Order?",
       text: "You won't be able to recover this order.",
@@ -190,17 +198,29 @@ const Orders = () => {
                           : "-"}
                       </td>
                       <td className="text-center">
-                        <Link
-                          to={`/admin/orders/${order.id}`}
-                          className="btn btn-sm btn-outline-primary me-2"
-                          title="View"
-                        >
-                          <Eye size={16} />
-                        </Link>
+                        {canManageOrders ? (
+                          <Link
+                            to={`/admin/orders/${order.id}`}
+                            className="btn btn-sm btn-outline-primary me-2"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary me-2"
+                            title="No manage permission"
+                            disabled
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
 
                         <button
                           className="btn btn-sm btn-outline-danger"
                           title="Delete"
+                          disabled={!canManageOrders}
                           onClick={() => handleDelete(order.id)}
                         >
                           <Trash2 size={16} />

@@ -2,8 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { getAllCustomers } from "../../services/customerService";
+import { canAccessPage } from "../../components/PrivateRoute";
 
 const Customers = () => {
+  const user = JSON.parse(
+    localStorage.getItem("user") || sessionStorage.getItem("user") || "null",
+  );
+  const canManageCustomers = canAccessPage(user, "customers", "manage");
+
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -136,13 +142,24 @@ const Customers = () => {
                           : "-"}
                       </td>
                       <td className="text-center">
-                        <Link
-                          to={`/admin/customers/${customer.id}`}
-                          className="btn btn-sm btn-outline-primary me-2"
-                          title="View"
-                        >
-                          <Eye size={16} />
-                        </Link>
+                        {canManageCustomers ? (
+                          <Link
+                            to={`/admin/customers/${customer.id}`}
+                            className="btn btn-sm btn-outline-primary me-2"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary me-2"
+                            title="No manage permission"
+                            disabled
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
