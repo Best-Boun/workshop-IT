@@ -12,15 +12,8 @@ const GoogleButton = ({ disabled = false }) => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      const role = res.data.user.role;
-
-      if (role === "superadmin") {
-        window.location.href = "/superadmin/dashboard";
-      } else if (role === "admin") {
-        window.location.href = "/admin/dashboard";
-      } else {
-        window.location.href = "/";
-      }
+      // ชั่วคราวให้ทุก Role กลับหน้า Home
+      window.location.href = "/";
     } catch (err) {
       Swal.fire({
         icon: "error",

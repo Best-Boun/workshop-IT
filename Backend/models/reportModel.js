@@ -340,10 +340,33 @@ ORDER BY bucket ASC
           ? 100
           : 0;
 
+
+// ===============================
+// Fill missing timeline
+// ===============================
+let labels = [];
+let data = [];
+
+if (range === "today") {
+  const revenueMap = new Map(
+    currentRows.map((row) => [row.label, Number(row.revenue || 0)]),
+  );
+
+  for (let hour = 0; hour < 24; hour++) {
+    const label = `${String(hour).padStart(2, "0")}:00`;
+
+    labels.push(label);
+    data.push(revenueMap.get(label) || 0);
+  }
+} else {
+  labels = currentRows.map((row) => row.label);
+  data = currentRows.map((row) => Number(row.revenue || 0));
+}
+
     return {
       range,
-      labels: currentRows.map((row) => row.label),
-      data: currentRows.map((row) => Number(row.revenue || 0)),
+      labels,
+      data,
       current_revenue: Number(currentRevenue.toFixed(2)),
       previous_revenue: Number(previousRevenue.toFixed(2)),
       growth_percentage: Number(growthPercentage.toFixed(1)),
