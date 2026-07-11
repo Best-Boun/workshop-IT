@@ -257,6 +257,26 @@ class ProductController {
       });
     }
   }
+
+  // GET /api/products/brands
+  static async getBrands(req, res) {
+    try {
+      const brands = await ProductModel.getBrands();
+
+      res.status(200).json({
+        success: true,
+        count: brands.length,
+        data: brands,
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch brands",
+      });
+    }
+  }
 }
 
 

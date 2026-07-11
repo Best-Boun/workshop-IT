@@ -5,7 +5,9 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const CATEGORY_OPTIONS = ["Computer Set", "Notebook"];
-const BRAND_OPTIONS = ["ASUS", "MSI", "Lenovo", "Dell", "HP", "Acer"];
+
+
+
 
 const Products = () => {
   const location = useLocation();
@@ -19,6 +21,7 @@ const Products = () => {
   const [pendingMap, setPendingMap] = useState({});
   const [microActionMap, setMicroActionMap] = useState({});
   const [stockNoticeMap, setStockNoticeMap] = useState({});
+  const [brands, setBrands] = useState([]);
 
   const categoryQuery = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -67,6 +70,13 @@ const Products = () => {
       return acc;
     }, {});
     setCartQtyMap(qtyMap);
+  }, []);
+
+  useEffect(() => {
+    api
+      .get("/products/brands")
+      .then((res) => setBrands(res.data.data))
+      .catch(console.error);
   }, []);
 
   const setPending = (productId, value) => {
@@ -327,7 +337,8 @@ const Products = () => {
       {/* Hero */}
       <div
         style={{
-          background: "linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #0ea5e9 100%)",
+          background:
+            "linear-gradient(135deg, #0f172a 0%, #2563eb 60%, #0ea5e9 100%)",
           padding: "3rem 0 2.5rem",
           color: "#fff",
         }}
@@ -344,10 +355,22 @@ const Products = () => {
           >
             TechPulse · Store
           </p>
-          <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: "0.25rem" }}>
+          <h1
+            style={{
+              fontSize: "2rem",
+              fontWeight: 800,
+              marginBottom: "0.25rem",
+            }}
+          >
             All Products
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.9rem", marginBottom: 0 }}>
+          <p
+            style={{
+              color: "rgba(255,255,255,0.72)",
+              fontSize: "0.9rem",
+              marginBottom: 0,
+            }}
+          >
             {loading ? "Loading..." : `${products.length} products available`}
           </p>
         </div>
@@ -387,7 +410,9 @@ const Products = () => {
 
           <div className="row g-3">
             <div className="col-md-6">
-              <label className="form-label fw-semibold text-dark mb-1">Category</label>
+              <label className="form-label fw-semibold text-dark mb-1">
+                Category
+              </label>
               <select
                 className="form-select rounded-3"
                 value={category}
@@ -403,16 +428,18 @@ const Products = () => {
             </div>
 
             <div className="col-md-6">
-              <label className="form-label fw-semibold text-dark mb-1">Brand</label>
+              <label className="form-label fw-semibold text-dark mb-1">
+                Brand
+              </label>
               <select
                 className="form-select rounded-3"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
               >
                 <option value="">All Brands</option>
-                {BRAND_OPTIONS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
+                {brands.map((item) => (
+                  <option key={item.brand} value={item.brand}>
+                    {item.brand}
                   </option>
                 ))}
               </select>
@@ -431,173 +458,229 @@ const Products = () => {
           </div>
         ) : (
           <div className="row g-4">
-            {products.map((product) => (
+            {products.map((product) =>
               (() => {
                 const stock = Math.max(0, Number(product.stock) || 0);
                 const currentQty = Number(cartQtyMap[product.id] || 0);
                 const isMaxInCart = stock > 0 && currentQty >= stock;
 
                 return (
-              <div className="col-sm-6 col-lg-4" key={product.id}>
-                <div
-                  className="card h-100 border-0 rounded-4 shadow-sm"
-                  style={{ transition: "transform 0.2s, box-shadow 0.2s" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow = "0 12px 36px rgba(15,23,42,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "";
-                  }}
-                >
-                  {/* Product image */}
-                  <div
-                    style={{
-                      height: 220,
-                      borderRadius: "1rem 1rem 0 0",
-                      overflow: "hidden",
-                      background: "linear-gradient(180deg,#e0f2fe,#bae6fd 72%,#7dd3fc)",
-                    }}
-                  >
-                    <img
-                      src={`http://localhost:5000/uploads/${product.image}`}
-                      alt={product.name}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      onError={(e) => { e.target.style.display = "none"; }}
-                    />
-                  </div>
-
-                  <div className="card-body d-flex flex-column p-4">
-                    {/* Category badge */}
-                    {product.category && (
-                      <span
-                        className="badge rounded-pill mb-2"
-                        style={{
-                          background: "rgba(37,99,235,0.1)",
-                          color: "#2563eb",
-                          fontSize: "0.72rem",
-                          fontWeight: 700,
-                          alignSelf: "flex-start",
-                          padding: "0.35em 0.85em",
-                        }}
-                      >
-                        {product.category}
-                      </span>
-                    )}
-
-                    {product.warranty && (
-                      <span
-                        className="badge rounded-pill mb-2"
-                        title={product.warranty_provider || "Warranty"}
-                        style={{
-                          background: "rgba(15,23,42,0.08)",
-                          color: "#334155",
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          alignSelf: "flex-start",
-                          padding: "0.3em 0.75em",
-                        }}
-                      >
-                        🛡 {product.warranty}
-                      </span>
-                    )}
-
-                    <h5 className="fw-bold mb-1" style={{ color: "#0f172a" }}>
-                      {product.name}
-                    </h5>
-                    <p className="text-muted small mb-2">{product.brand}</p>
-                    <p
-                      className="text-muted flex-grow-1"
-                      style={{ fontSize: "0.85rem", lineHeight: 1.55 }}
+                  <div className="col-sm-6 col-lg-4" key={product.id}>
+                    <div
+                      className="card h-100 border-0 rounded-4 shadow-sm"
+                      style={{ transition: "transform 0.2s, box-shadow 0.2s" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 12px 36px rgba(15,23,42,0.12)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "";
+                        e.currentTarget.style.boxShadow = "";
+                      }}
                     >
-                      {product.description}
-                    </p>
+                      {/* Product image */}
+                      <div
+                        style={{
+                          height: 220,
+                          borderRadius: "1rem 1rem 0 0",
+                          overflow: "hidden",
+                          background:
+                            "linear-gradient(180deg,#e0f2fe,#bae6fd 72%,#7dd3fc)",
+                        }}
+                      >
+                        <img
+                          src={`http://localhost:5000/uploads/${product.image}`}
+                          alt={product.name}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      </div>
 
-                    {product.stock !== undefined && (
-                      <p className="small mb-2" style={{ color: product.stock > 0 ? "#16a34a" : "#dc2626" }}>
-                        {product.stock > 0 ? `✓ In stock (${product.stock})` : "✗ Out of stock"}
-                      </p>
-                    )}
-
-                    <div className="d-flex align-items-center justify-content-between mt-2 mb-3">
-                      <span className="fw-bold fs-5" style={{ color: "#2563eb" }}>
-                        ฿{Number(product.price).toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="cart-action-shell">
-                      {currentQty === 0 ? (
-                        <div key="add" className="cart-action-switch cart-action-add-wrap">
-                          <button
-                            className="btn btn-primary rounded-pill w-100 fw-semibold"
-                            onClick={(event) => handleAddToCartClick(event, product)}
-                            disabled={stock === 0 || pendingMap[product.id] || isMaxInCart}
-                            aria-label={`Add ${product.name} to cart`}
+                      <div className="card-body d-flex flex-column p-4">
+                        {/* Category badge */}
+                        {product.category && (
+                          <span
+                            className="badge rounded-pill mb-2"
+                            style={{
+                              background: "rgba(37,99,235,0.1)",
+                              color: "#2563eb",
+                              fontSize: "0.72rem",
+                              fontWeight: 700,
+                              alignSelf: "flex-start",
+                              padding: "0.35em 0.85em",
+                            }}
                           >
-                            🛒 Add to Cart
-                          </button>
-                        </div>
-                      ) : (
-                        <div key="qty" className="cart-action-switch cart-action-qty-wrap">
-                          <div className="cart-qty-control" role="group" aria-label={`${product.name} quantity in cart`}>
-                            <button
-                              className={`cart-qty-btn ${microActionMap[product.id] === "minus" ? "cart-qty-btn--active" : ""}`}
-                              onClick={() => handleDecreaseQtyClick(product)}
-                              disabled={pendingMap[product.id]}
-                              aria-label={`Decrease ${product.name} quantity`}
-                            >
-                              −
-                            </button>
+                            {product.category}
+                          </span>
+                        )}
 
-                            <div className="cart-qty-text" aria-live="polite">
-                              <span className={`cart-qty-icon ${microActionMap[product.id] === "plus" ? "cart-qty-icon--bounce" : ""}`}>🛒</span>
-                              <span
-                                key={`${product.id}-${cartQtyMap[product.id]}-${microActionMap[product.id] || "steady"}`}
-                                className={`cart-qty-number ${microActionMap[product.id] === "plus" ? "cart-qty-number--plus" : ""} ${microActionMap[product.id] === "minus" ? "cart-qty-number--minus" : ""}`}
+                        {product.warranty && (
+                          <span
+                            className="badge rounded-pill mb-2"
+                            title={product.warranty_provider || "Warranty"}
+                            style={{
+                              background: "rgba(15,23,42,0.08)",
+                              color: "#334155",
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              alignSelf: "flex-start",
+                              padding: "0.3em 0.75em",
+                            }}
+                          >
+                            🛡 {product.warranty}
+                          </span>
+                        )}
+
+                        <h5
+                          className="fw-bold mb-1"
+                          style={{ color: "#0f172a" }}
+                        >
+                          {product.name}
+                        </h5>
+                        <p className="text-muted small mb-2">{product.brand}</p>
+                        <p
+                          className="text-muted flex-grow-1"
+                          style={{ fontSize: "0.85rem", lineHeight: 1.55 }}
+                        >
+                          {product.description}
+                        </p>
+
+                        {product.stock !== undefined && (
+                          <p
+                            className="small mb-2"
+                            style={{
+                              color: product.stock > 0 ? "#16a34a" : "#dc2626",
+                            }}
+                          >
+                            {product.stock > 0
+                              ? `✓ In stock (${product.stock})`
+                              : "✗ Out of stock"}
+                          </p>
+                        )}
+
+                        <div className="d-flex align-items-center justify-content-between mt-2 mb-3">
+                          <span
+                            className="fw-bold fs-5"
+                            style={{ color: "#2563eb" }}
+                          >
+                            ฿{Number(product.price).toLocaleString()}
+                          </span>
+                        </div>
+
+                        <div className="cart-action-shell">
+                          {currentQty === 0 ? (
+                            <div
+                              key="add"
+                              className="cart-action-switch cart-action-add-wrap"
+                            >
+                              <button
+                                className="btn btn-primary rounded-pill w-100 fw-semibold"
+                                onClick={(event) =>
+                                  handleAddToCartClick(event, product)
+                                }
+                                disabled={
+                                  stock === 0 ||
+                                  pendingMap[product.id] ||
+                                  isMaxInCart
+                                }
+                                aria-label={`Add ${product.name} to cart`}
                               >
-                                {cartQtyMap[product.id]}
-                              </span>
-                              <span>in Cart</span>
+                                🛒 Add to Cart
+                              </button>
                             </div>
-
-                            <button
-                              className={`cart-qty-btn ${microActionMap[product.id] === "plus" ? "cart-qty-btn--active" : ""}`}
-                              onClick={() => handleIncreaseQtyClick(product)}
-                              disabled={pendingMap[product.id] || isMaxInCart}
-                              aria-label={`Increase ${product.name} quantity`}
+                          ) : (
+                            <div
+                              key="qty"
+                              className="cart-action-switch cart-action-qty-wrap"
                             >
-                              +
-                            </button>
-                          </div>
+                              <div
+                                className="cart-qty-control"
+                                role="group"
+                                aria-label={`${product.name} quantity in cart`}
+                              >
+                                <button
+                                  className={`cart-qty-btn ${microActionMap[product.id] === "minus" ? "cart-qty-btn--active" : ""}`}
+                                  onClick={() =>
+                                    handleDecreaseQtyClick(product)
+                                  }
+                                  disabled={pendingMap[product.id]}
+                                  aria-label={`Decrease ${product.name} quantity`}
+                                >
+                                  −
+                                </button>
+
+                                <div
+                                  className="cart-qty-text"
+                                  aria-live="polite"
+                                >
+                                  <span
+                                    className={`cart-qty-icon ${microActionMap[product.id] === "plus" ? "cart-qty-icon--bounce" : ""}`}
+                                  >
+                                    🛒
+                                  </span>
+                                  <span
+                                    key={`${product.id}-${cartQtyMap[product.id]}-${microActionMap[product.id] || "steady"}`}
+                                    className={`cart-qty-number ${microActionMap[product.id] === "plus" ? "cart-qty-number--plus" : ""} ${microActionMap[product.id] === "minus" ? "cart-qty-number--minus" : ""}`}
+                                  >
+                                    {cartQtyMap[product.id]}
+                                  </span>
+                                  <span>in Cart</span>
+                                </div>
+
+                                <button
+                                  className={`cart-qty-btn ${microActionMap[product.id] === "plus" ? "cart-qty-btn--active" : ""}`}
+                                  onClick={() =>
+                                    handleIncreaseQtyClick(product)
+                                  }
+                                  disabled={
+                                    pendingMap[product.id] || isMaxInCart
+                                  }
+                                  aria-label={`Increase ${product.name} quantity`}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {isMaxInCart && (
+                            <p
+                              className="small text-warning mb-0 mt-2 fw-semibold"
+                              aria-live="polite"
+                            >
+                              Maximum stock reached
+                            </p>
+                          )}
+
+                          {!isMaxInCart && stockNoticeMap[product.id] && (
+                            <p
+                              className="small text-warning mb-0 mt-2 fw-semibold"
+                              aria-live="polite"
+                            >
+                              {stockNoticeMap[product.id]}
+                            </p>
+                          )}
                         </div>
-                      )}
 
-                      {isMaxInCart && (
-                        <p className="small text-warning mb-0 mt-2 fw-semibold" aria-live="polite">
-                          Maximum stock reached
-                        </p>
-                      )}
-
-                      {!isMaxInCart && stockNoticeMap[product.id] && (
-                        <p className="small text-warning mb-0 mt-2 fw-semibold" aria-live="polite">
-                          {stockNoticeMap[product.id]}
-                        </p>
-                      )}
+                        <button
+                          className="btn btn-outline-secondary rounded-pill w-100 fw-semibold mt-2"
+                          onClick={() => navigate(`/products/${product.id}`)}
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
-
-                    <button
-                      className="btn btn-outline-secondary rounded-pill w-100 fw-semibold mt-2"
-                      onClick={() => navigate(`/products/${product.id}`)}
-                    >
-                      View Details
-                    </button>
                   </div>
-                </div>
-              </div>
                 );
-              })()
-            ))}
+              })(),
+            )}
           </div>
         )}
       </div>
@@ -631,7 +714,12 @@ const Products = () => {
           </span>
           <button
             className="btn btn-sm rounded-pill ms-2"
-            style={{ background: "#2563eb", color: "#fff", fontSize: "0.75rem", padding: "0.2rem 0.75rem" }}
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              fontSize: "0.75rem",
+              padding: "0.2rem 0.75rem",
+            }}
             onClick={() => navigate("/cart")}
           >
             View Cart

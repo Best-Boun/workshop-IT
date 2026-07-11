@@ -385,6 +385,18 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
     return result;
   }
+
+  // ดึง Brand ทั้งหมด
+  static async getBrands() {
+    const [rows] = await pool.query(`
+    SELECT DISTINCT brand
+    FROM products
+    WHERE status = 'active'
+    ORDER BY brand ASC
+  `);
+
+    return rows;
+  }
 }
 
  

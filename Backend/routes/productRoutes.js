@@ -20,6 +20,9 @@ router.get("/search", ProductController.searchProducts);
 // ดึงหมวดหมู่ทั้งหมด
 router.get("/categories/all", ProductController.getCategories);
 
+// ดึง Brand
+router.get("/brands", ProductController.getBrands);
+
 // ดึงสินค้าตามหมวด
 router.get("/category/:id", ProductController.getProductsByCategory);
 
@@ -44,5 +47,7 @@ router.patch("/:id/status", ProductController.toggleProductStatus);
 
 // ลบสินค้า
 router.delete("/:id", ProductController.deleteProduct);
+
+
 
 export default router;
