@@ -37,7 +37,7 @@ const Dashboard = () => {
    // โหลดใหม่ทุก 5 วินาที
    const interval = setInterval(() => {
      void loadDashboard();
-   }, 5000);
+   }, 30000);
 
    return () => clearInterval(interval);
  }, []);
@@ -116,19 +116,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="mt-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="text-muted small">Growth vs yesterday</span>
-                  <span
-                    className={`fw-semibold ${Number(summary?.today_growth_percentage || 0) >= 0 ? "text-success" : "text-danger"}`}
-                  >
-                    {Number(summary?.today_growth_percentage || 0).toFixed(1)}%
-                  </span>
-                </div>
-                <small className="text-muted">
-                  {summary?.today_growth_trend || "No Change"}
-                </small>
-              </div>
+                      
             </div>
           </div>
 
@@ -167,15 +155,15 @@ const Dashboard = () => {
         <div className="col-lg-5">
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body">
-              <h5 className="fw-bold mb-3">Monthly Goal</h5>
+              <h5 className="fw-bold mb-3">Monthly Sales Target</h5>
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-muted">Target</span>
+                <span className="text-muted">Sales Target</span>
                 <strong>
                   ฿{Number(summary?.monthly_goal || 1000000).toLocaleString()}
                 </strong>
               </div>
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="text-muted">Current</span>
+                <span className="text-muted">Current Revenue</span>
                 <strong>
                   ฿
                   {Number(summary?.current_month_revenue || 0).toLocaleString()}
@@ -192,7 +180,7 @@ const Dashboard = () => {
               <div className="d-flex justify-content-between align-items-center mt-2 small text-muted">
                 <span>{summary?.monthly_goal_progress || 0}% completed</span>
                 <span>
-                  Remaining ฿
+                  Remaining Target ฿
                   {Number(
                     summary?.monthly_goal_remaining || 0,
                   ).toLocaleString()}

@@ -78,46 +78,10 @@ const RevenueChart = () => {
     (_, index) => new Date().getFullYear() - index,
   );
 
-  const formatGrowth = (growth, previous, current) => {
-    if (previous === 0 && current > 0) {
-      return {
-        text: "+100%",
-        type: "up",
-        icon: "↑",
-      };
-    }
-
-    if (growth > 0) {
-      return {
-        text: `+${growth.toFixed(1)}%`,
-        type: "up",
-        icon: "↑",
-      };
-    }
-
-    if (growth < 0) {
-      return {
-        text: `${growth.toFixed(1)}%`,
-        type: "down",
-        icon: "↓",
-      };
-    }
-
-    return {
-      text: "0%",
-      type: "flat",
-      icon: "→",
-    };
-  };
+  
 
 
-const growth = analytics
-  ? formatGrowth(
-      analytics.growth_percentage || 0,
-      analytics.previous_revenue || 0,
-      analytics.current_revenue || 0,
-    )
-  : { text: "0%", type: "flat", icon: "→" };
+
   
   return (
     <div className="card shadow-sm border-0 h-100">
@@ -183,21 +147,13 @@ const growth = analytics
                 label: "Avg Order",
                 value: `฿${Number(analytics.average_order_value || 0).toLocaleString()}`,
               },
+
               {
-                label: "Growth %",
-                value: (
-                  <span className={`growth-badge ${growth.type}`}>
-                    <span className="me-1">{growth.icon}</span>
-                    {growth.text}
-                  </span>
-                ),
-              },
-              {
-                label: "Prev Revenue",
+                label: "Previous Revenue",
                 value: `฿${Number(analytics.previous_revenue || 0).toLocaleString()}`,
               },
             ].map((item) => (
-              <div className="col-md-4 col-xl-2" key={item.label}>
+              <div className="col-md-6 col-xl" key={item.label}>
                 <div className="dashboard-ghost p-2 rounded-3">
                   <small className="text-muted d-block">{item.label}</small>
                   <strong className="fs-6">{item.value}</strong>

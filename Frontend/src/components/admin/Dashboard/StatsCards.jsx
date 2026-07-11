@@ -24,11 +24,11 @@ const StatsCards = ({ summary, loading }) => {
       meta: "Registered users",
     },
     {
-      title: "Today Revenue",
-      value: `฿${Number(summary?.today_revenue || 0).toLocaleString()}`,
+      title: "Total Revenue",
+      value: `฿${Number(summary?.total_revenue || 0).toLocaleString()}`,
       icon: "bi-cash-stack",
       color: "danger",
-      meta: `${Number(summary?.today_growth_percentage || 0).toFixed(1)}% vs yesterday`,
+      meta: "All completed sales",
     },
   ];
 

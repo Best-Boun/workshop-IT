@@ -18,6 +18,10 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef(null);
 
+  const [cartCount, setCartCount] = useState(0);
+
+  const [activeSection, setActiveSection] = useState("");
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -57,6 +61,26 @@ const Navbar = () => {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, navigate, location.pathname, location.search]);
 
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+      setCartCount(total);
+    };
+
+    updateCartCount();
+
+    window.addEventListener("storage", updateCartCount);
+    window.addEventListener("cartUpdated", updateCartCount);
+
+    return () => {
+      window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("cartUpdated", updateCartCount);
+    };
+  }, []);
+
   const handleLogout = () => {
     clearAuthSession();
 
@@ -72,6 +96,8 @@ const Navbar = () => {
 
   const handleLogoClick = (e) => {
     e.preventDefault();
+
+    setActiveSection("");
 
     if (location.pathname === "/") {
       window.scrollTo({
@@ -94,11 +120,23 @@ const Navbar = () => {
   const handleContactClick = (e) => {
     e.preventDefault();
 
-    const footerSection = document.getElementById("contact");
+    setActiveSection("contact");
 
-    if (footerSection) {
-      footerSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (location.pathname !== "/") {
+      navigate("/");
+
+      setTimeout(() => {
+        document
+          .getElementById("contact")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
+
+      return;
     }
+
+    document
+      .getElementById("contact")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -135,7 +173,7 @@ const Navbar = () => {
           >
             <div className="input-group">
               <span className="input-group-text bg-white border-end-0 text-muted">
-                🔍
+                <i class="bi bi-search"></i>
               </span>
 
               <input
@@ -150,13 +188,38 @@ const Navbar = () => {
 
           <ul className="navbar-nav mb-2 mb-lg-0 align-items-center gap-2">
             <li className="nav-item">
-              <Link className="nav-link active" to="/">
+              <Link
+                className={`nav-link ${
+                  location.pathname === "/" && activeSection !== "contact"
+                    ? "active"
+                    : ""
+                }`}
+                to="/"
+                onClick={(e) => {
+                  setActiveSection("");
+
+                  if (location.pathname === "/") {
+                    e.preventDefault();
+
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }
+                }}
+              >
                 Home
               </Link>
             </li>
 
             <li className="nav-item">
-              <Link className="nav-link" to="/products">
+              <Link
+                className={`nav-link ${
+                  location.pathname.startsWith("/products") ? "active" : ""
+                }`}
+                to="/products"
+                onClick={() => setActiveSection("")}
+              >
                 Products
               </Link>
             </li>
@@ -169,7 +232,9 @@ const Navbar = () => {
 
             <li className="nav-item">
               <a
-                className="nav-link"
+                className={`nav-link ${
+                  activeSection === "contact" ? "active" : ""
+                }`}
                 href="#contact"
                 onClick={handleContactClick}
               >
@@ -178,12 +243,29 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item me-3">
-              <Link
-                to="/cart"
-                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-2 js-cart-target"
-              >
-                🛒 Cart
-              </Link>
+              <li className="nav-item me-3">
+                <Link
+                  to="/cart"
+                  className="btn btn-outline-primary btn-sm position-relative d-flex align-items-center gap-2 js-cart-target"
+                >
+                  🛒 Cart
+                  {cartCount > 0 && (
+                    <span
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style={{
+                        minWidth: "20px",
+                        height: "20px",
+                        fontSize: "0.65rem",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {cartCount > 99 ? "99+" : cartCount}
+                    </span>
+                  )}
+                </Link>
+              </li>
             </li>
 
             {token && user ? (

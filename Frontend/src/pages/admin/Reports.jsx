@@ -7,6 +7,7 @@ import {
   getPaymentAnalytics,
 } from "../../services/reportService";
 import { canAccessPage } from "../../components/PrivateRoute";
+import exportReportPDF from "../../utils/exportReportPDF";
 
 // Temporary hardcoded data until real APIs are available.
 // Replace these with live data once backend endpoints are ready.
@@ -190,11 +191,18 @@ const Reports = () => {
   };
 
   // PDF export backend isn't ready yet - UI only for now.
-  const handleExportPDF = () => {
-    if (!canManageReports) return;
+ const handleExportPDF = async () => {
+   if (!canManageReports) return;
 
-    alert("PDF export is coming soon.");
-  };
+   await exportReportPDF({
+     summary,
+     sales,
+     products,
+     paymentAnalytics,
+     statusCards,
+     salesGrowth,
+   });
+ };
 
   return (
     <div className="container-fluid">
@@ -265,104 +273,110 @@ const Reports = () => {
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body">
               <h5 className="fw-bold mb-3">Revenue Trend</h5>
-
-              {sales.length === 0 && (
-                <div className="text-center text-muted py-5">
-                  <i className="bi bi-bar-chart-line fs-1 d-block mb-2 opacity-50" />
-                  No sales data found yet.
-                </div>
-              )}
-
-              {sales.length === 1 && (
-                <div className="d-flex align-items-center justify-content-between border rounded-3 p-4">
-                  <div>
-                    <p className="text-muted small mb-1">{sales[0].month}</p>
-                    <h3 className="fw-bold mb-0">
-                      ฿{Number(sales[0].revenue || 0).toLocaleString()}
-                    </h3>
-                    <small className="text-muted">
-                      {sales[0].order_count || 0} orders
-                    </small>
+              <div id="revenue-chart">
+                {sales.length === 0 && (
+                  <div className="text-center text-muted py-5">
+                    <i className="bi bi-bar-chart-line fs-1 d-block mb-2 opacity-50" />
+                    No sales data found yet.
                   </div>
-                  <div className="text-end">
-                    <span className="badge bg-primary-subtle text-primary px-3 py-2">
-                      <i className="bi bi-info-circle me-1" />
-                      More months needed for a trend
-                    </span>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {sales.length > 1 && (
-                <div
-                  className="d-flex align-items-end gap-3 px-2"
-                  style={{ height: "220px" }}
-                >
-                  {sales.map((item) => {
-                    const revenue = Number(item.revenue || 0);
-                    const heightPct =
-                      maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
-                    return (
-                      <div
-                        key={item.month}
-                        className="d-flex flex-column align-items-center justify-content-end flex-fill h-100"
-                        style={{ maxWidth: "90px" }}
-                      >
-                        <small className="text-muted mb-1">
-                          ฿{revenue.toLocaleString()}
-                        </small>
+                {sales.length === 1 && (
+                  <div className="d-flex align-items-center justify-content-between border rounded-3 p-4">
+                    <div>
+                      <p className="text-muted small mb-1">{sales[0].month}</p>
+                      <h3 className="fw-bold mb-0">
+                        ฿{Number(sales[0].revenue || 0).toLocaleString()}
+                      </h3>
+                      <small className="text-muted">
+                        {sales[0].order_count || 0} orders
+                      </small>
+                    </div>
+                    <div className="text-end">
+                      <span className="badge bg-primary-subtle text-primary px-3 py-2">
+                        <i className="bi bi-info-circle me-1" />
+                        More months needed for a trend
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {sales.length > 1 && (
+                  <div
+                    className="d-flex align-items-end gap-3 px-2"
+                    style={{ height: "220px" }}
+                  >
+                    {sales.map((item) => {
+                      const revenue = Number(item.revenue || 0);
+                      const heightPct =
+                        maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
+                      return (
                         <div
-                          className="bg-primary rounded-top w-100"
-                          style={{
-                            height: `${Math.max(heightPct, 2)}%`,
-                            minHeight: "4px",
-                          }}
-                          title={`${item.month}: ฿${revenue.toLocaleString()}`}
-                        />
-                        <small className="text-muted mt-2">{item.month}</small>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                          key={item.month}
+                          className="d-flex flex-column align-items-center justify-content-end flex-fill h-100"
+                          style={{ maxWidth: "90px" }}
+                        >
+                          <small className="text-muted mb-1">
+                            ฿{revenue.toLocaleString()}
+                          </small>
+                          <div
+                            className="bg-primary rounded-top w-100"
+                            style={{
+                              height: `${Math.max(heightPct, 2)}%`,
+                              minHeight: "4px",
+                            }}
+                            title={`${item.month}: ฿${revenue.toLocaleString()}`}
+                          />
+                          <small className="text-muted mt-2">
+                            {item.month}
+                          </small>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
         {/* Section 3: Order Analytics */}
         <div className="col-lg-4">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body">
-              <h5 className="fw-bold mb-3">Order Analytics</h5>
-              <div className="d-grid gap-4">
-                {statusCards.map((item) => {
-                  const pct =
-                    totalStatusCount > 0
-                      ? Math.round(
-                          (Number(item.value || 0) / totalStatusCount) * 100,
-                        )
-                      : 0;
-                  return (
-                    <ProgressRow
-                      key={item.label}
-                      icon={item.icon}
-                      label={item.label}
-                      value={`${item.value} (${pct}%)`}
-                      pct={pct}
-                      color={item.color}
-                    />
-                  );
-                })}
+              <div id="order-analytics">
+                <h5 className="fw-bold mb-3">Order Analytics</h5>
+
+                <div className="d-grid gap-4">
+                  {statusCards.map((item) => {
+                    const pct =
+                      totalStatusCount > 0
+                        ? Math.round(
+                            (Number(item.value || 0) / totalStatusCount) * 100,
+                          )
+                        : 0;
+
+                    return (
+                      <ProgressRow
+                        key={item.label}
+                        icon={item.icon}
+                        label={item.label}
+                        value={`${item.value} (${pct}%)`}
+                        pct={pct}
+                        color={item.color}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
+      
       <div className="row g-4 mb-4">
         {/* Section 4: Top Selling Products */}
         <div className="col-lg-8">
-          <div className="card shadow-sm border-0">
+          <div id="top-products" className="card shadow-sm border-0">
             <div className="card-body">
               <h5 className="fw-bold mb-3">Top Selling Products</h5>
               <div className="table-responsive">
@@ -407,28 +421,30 @@ const Reports = () => {
         <div className="col-lg-4">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-body">
-              <h5 className="fw-bold mb-1">Payment Analytics</h5>
-              <p className="text-muted small mb-3">
-                Real payment statistics based on completed payments.
-              </p>
-              <div className="d-grid gap-4">
-                {paymentAnalytics.map((item) => (
-                  <ProgressRow
-                    key={item.method}
-                    icon={
-                      {
-                        credit_card: "bi-credit-card",
-                        promptpay: "bi-phone",
-                        bank_transfer: "bi-bank",
-                        cod: "bi-cash-coin",
-                      }[item.method] || "bi-wallet2"
-                    }
-                    label={paymentName[item.method] || item.method}
-                    value={`${item.count} (${item.percentage}%)`}
-                    pct={item.percentage}
-                    color="primary"
-                  />
-                ))}
+              <div id="payment-analytics">
+                <h5 className="fw-bold mb-1">Payment Analytics</h5>
+                <p className="text-muted small mb-3">
+                  Real payment statistics based on completed payments.
+                </p>
+                <div className="d-grid gap-4">
+                  {paymentAnalytics.map((item) => (
+                    <ProgressRow
+                      key={item.method}
+                      icon={
+                        {
+                          credit_card: "bi-credit-card",
+                          promptpay: "bi-phone",
+                          bank_transfer: "bi-bank",
+                          cod: "bi-cash-coin",
+                        }[item.method] || "bi-wallet2"
+                      }
+                      label={paymentName[item.method] || item.method}
+                      value={`${item.count} (${item.percentage}%)`}
+                      pct={item.percentage}
+                      color="primary"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -436,7 +452,7 @@ const Reports = () => {
       </div>
 
       {/* Monthly Revenue Summary (replaces Recent Orders) */}
-      <div className="card shadow-sm border-0">
+      <div id="monthly-summary" className="card shadow-sm border-0">
         <div className="card-body">
           <h5 className="fw-bold mb-3">Monthly Revenue Summary</h5>
           <div className="table-responsive">

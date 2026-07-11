@@ -14,7 +14,7 @@ const QuickActions = () => {
             onClick={() => navigate("/admin/products")}
           >
             <i className="bi bi-plus-circle me-2"></i>
-            Add Product
+            Manage Products
           </button>
 
           <button
@@ -22,7 +22,7 @@ const QuickActions = () => {
             onClick={() => navigate("/admin/categories")}
           >
             <i className="bi bi-grid me-2"></i>
-            Add Category
+            Manage Categories
           </button>
 
           <button

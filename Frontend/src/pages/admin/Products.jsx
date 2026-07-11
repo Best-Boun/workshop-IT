@@ -19,11 +19,11 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
-const [category, setCategory] = useState("");
-const [status, setStatus] = useState("");
-const [currentPage, setCurrentPage] = useState(1);
-const [itemsPerPage] = useState(10);
-
+  const [category, setCategory] = useState("");
+  const [brand, setBrand] = useState("");
+  const [status, setStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const fetchProducts = async () => {
     try {
@@ -34,133 +34,143 @@ const [itemsPerPage] = useState(10);
     }
   };
 
-const fetchCategories = async () => {
-  try {
-    const data = await getCategories();
-    setCategories(data);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
-};
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
-  
-const handleDelete = async (id) => {
- if (!canManageProducts) return;
+  const handleDelete = async (id) => {
+    if (!canManageProducts) return;
 
- const result = await Swal.fire({
-   title: "Delete Product?",
-   text: "You won't be able to recover this product.",
-   icon: "warning",
-   showCancelButton: true,
-   confirmButtonColor: "#dc3545",
-   cancelButtonColor: "#6c757d",
-   confirmButtonText: "Yes, Delete",
-   cancelButtonText: "Cancel",
- });
-
- if (!result.isConfirmed) return;
-
-
-  try {
-    await deleteProduct(id);
-
-    Swal.fire({
-      icon: "success",
-      title: "Deleted!",
-      text: "Product deleted successfully.",
-      timer: 1800,
-      showConfirmButton: false,
+    const result = await Swal.fire({
+      title: "Delete Product?",
+      text: "You won't be able to recover this product.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "Cancel",
     });
 
-    fetchProducts();
-  } catch (error) {
-    console.error(error);
+    if (!result.isConfirmed) return;
 
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Failed to delete product.",
-    });
-  }
-};
+    try {
+      await deleteProduct(id);
 
-const handleToggleStatus = async (product) => {
-  if (!canManageProducts) return;
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Product deleted successfully.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
 
-  const newStatus = product.status === "active" ? "inactive" : "active";
+      fetchProducts();
+    } catch (error) {
+      console.error(error);
 
-  const result = await Swal.fire({
-    title: "Change Product Status?",
-    html: `
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete product.",
+      });
+    }
+  };
+
+  const handleToggleStatus = async (product) => {
+    if (!canManageProducts) return;
+
+    const newStatus = product.status === "active" ? "inactive" : "active";
+
+    const result = await Swal.fire({
+      title: "Change Product Status?",
+      html: `
       <b>${product.name}</b><br/><br/>
       Change status to <b>${newStatus}</b> ?
     `,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes",
-    cancelButtonText: "Cancel",
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    await toggleProductStatus(product.id, newStatus);
-
-    Swal.fire({
-      icon: "success",
-      title: "Updated!",
-      text: "Product status updated successfully.",
-      timer: 1500,
-      showConfirmButton: false,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
     });
 
+    if (!result.isConfirmed) return;
+
+    try {
+      await toggleProductStatus(product.id, newStatus);
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Product status updated successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      fetchProducts();
+    } catch (error) {
+      console.error(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to update product status.",
+      });
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
-  } catch (error) {
-    console.error(error);
-
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Failed to update product status.",
-    });
-  }
-};
-
-
- useEffect(() => {
-   fetchProducts();
-   fetchCategories();
- }, []);
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, category, status]);
+  }, [search, category, brand, status]);
 
-const filteredProducts = products.filter((product) => {
-  const keyword = search.toLowerCase();
+  useEffect(() => {
+    setBrand("");
+  }, [category]);
 
-  const matchSearch =
-    product.name.toLowerCase().includes(keyword) ||
-    product.brand.toLowerCase().includes(keyword);
+  const brands = [
+    ...new Set(
+      products
+        .filter((p) => category === "" || p.category === category)
+        .map((p) => p.brand),
+    ),
+  ].sort();
 
-  const matchCategory = category === "" || product.category === category;
+  const filteredProducts = products.filter((product) => {
+    const keyword = search.toLowerCase();
 
-  const matchStatus = status === "" || product.status === status;
+    const matchSearch =
+      product.name.toLowerCase().includes(keyword) ||
+      product.brand.toLowerCase().includes(keyword);
 
-  return matchSearch && matchCategory && matchStatus;
-});
+    const matchCategory = category === "" || product.category === category;
 
+    const matchBrand = brand === "" || product.brand === brand;
 
+    const matchStatus = status === "" || product.status === status;
 
-const indexOfLastProduct = currentPage * itemsPerPage;
-const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+    return matchSearch && matchCategory && matchBrand && matchStatus;
+  }); // <-- ปิด filter ตรงนี้
 
-const currentProducts = filteredProducts.slice(
-  indexOfFirstProduct,
-  indexOfLastProduct,
-);
+  const indexOfLastProduct = currentPage * itemsPerPage;
 
-const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct,
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className="container-fluid">
@@ -186,7 +196,7 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body">
           <div className="row g-3">
-            <div className="col-lg-6">
+            <div className="col-lg-5">
               <input
                 type="text"
                 className="form-control"
@@ -212,7 +222,23 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
               </select>
             </div>
 
-            <div className="col-lg-3">
+            <div className="col-lg-2">
+              <select
+                className="form-select"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              >
+                <option value="">All Brands</option>
+
+                {brands.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-lg-2">
               <select
                 className="form-select"
                 value={status}
@@ -311,8 +337,17 @@ const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
                               : "bg-secondary"
                           }`}
                           role={canManageProducts ? "button" : undefined}
-                          style={{ cursor: canManageProducts ? "pointer" : "not-allowed", opacity: canManageProducts ? 1 : 0.75 }}
-                          onClick={canManageProducts ? () => handleToggleStatus(product) : undefined}
+                          style={{
+                            cursor: canManageProducts
+                              ? "pointer"
+                              : "not-allowed",
+                            opacity: canManageProducts ? 1 : 0.75,
+                          }}
+                          onClick={
+                            canManageProducts
+                              ? () => handleToggleStatus(product)
+                              : undefined
+                          }
                         >
                           {product.status === "active" ? "Active" : "Inactive"}
                         </span>

@@ -91,7 +91,16 @@ const startServer = async () => {
   await setupDatabase();
 
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log("");
+    console.log("==========================================");
+    console.log("      E-Commerce Admin API Server");
+    console.log("==========================================");
+    console.log("");
+    console.log(`🌐 API    : http://localhost:${PORT}`);
+    console.log(`📦 Mode   : ${process.env.NODE_ENV || "Development"}`);
+    console.log(`🕒 Started: ${new Date().toLocaleString("th-TH")}`);
+    console.log("");
+    console.log("==========================================");
   });
 };
 

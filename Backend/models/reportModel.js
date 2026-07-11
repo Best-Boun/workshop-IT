@@ -347,17 +347,68 @@ ORDER BY bucket ASC
 let labels = [];
 let data = [];
 
+// ใช้ bucket เป็น key แทน label
+const revenueMap = new Map(
+  currentRows.map((row) => [
+    row.bucket,
+    {
+      label: row.label,
+      revenue: Number(row.revenue || 0),
+    },
+  ]),
+);
+
 if (range === "today") {
-  const revenueMap = new Map(
-    currentRows.map((row) => [row.label, Number(row.revenue || 0)]),
-  );
-
   for (let hour = 0; hour < 24; hour++) {
-    const label = `${String(hour).padStart(2, "0")}:00`;
+    const bucket = `${String(hour).padStart(2, "0")}:00`;
 
-    labels.push(label);
-    data.push(revenueMap.get(label) || 0);
+    labels.push(bucket);
+    data.push(revenueMap.get(bucket)?.revenue || 0);
   }
+} else if (range === "5d" || range === "1m") {
+  const start = new Date(currentStart);
+
+  while (start < currentEnd) {
+    const bucket = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`;
+
+    const item = revenueMap.get(bucket);
+
+    labels.push(
+      start.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+      }),
+    );
+
+    data.push(item ? item.revenue : 0);
+
+    start.setDate(start.getDate() + 1);
+  }
+} else if (range === "3m") {
+  labels = currentRows.map((row) => row.label);
+  data = currentRows.map((row) => Number(row.revenue || 0));
+} else if (range === "6m" || range === "1y") {
+  const start = new Date(currentStart);
+
+  while (start < currentEnd) {
+    const bucket = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`;
+
+    const item = revenueMap.get(bucket);
+
+    labels.push(
+      start.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      }),
+    );
+
+    data.push(item ? item.revenue : 0);
+
+    start.setMonth(start.getMonth() + 1);
+  }
+} else if (range === "5y" || range === "all") {
+  labels = currentRows.map((row) => row.label);
+  data = currentRows.map((row) => Number(row.revenue || 0));
 } else {
   labels = currentRows.map((row) => row.label);
   data = currentRows.map((row) => Number(row.revenue || 0));

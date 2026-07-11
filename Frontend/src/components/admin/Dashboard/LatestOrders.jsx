@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRecentOrders } from "../../../services/reportService";
+import { Link } from "react-router-dom";
 
 const LatestOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -22,7 +23,13 @@ const LatestOrders = () => {
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="fw-bold mb-0">Latest Orders</h5>
-          <span className="text-muted small">Most recent 5</span>
+
+          <Link
+            to="/admin/orders"
+            className="text-decoration-none fw-semibold small"
+          >
+            View All →
+          </Link>
         </div>
 
         {orders.length === 0 ? (
@@ -45,7 +52,13 @@ const LatestOrders = () => {
                   <tr key={order.order_id}>
                     <td>#{order.order_id}</td>
 
-                    <td>{order.customer_name || "Guest"}</td>
+                    <td
+                      className="text-truncate"
+                      style={{ maxWidth: "180px" }}
+                      title={order.customer_name}
+                    >
+                      {order.customer_name || "Guest"}
+                    </td>
 
                     <td>
                       <span

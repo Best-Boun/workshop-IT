@@ -31,7 +31,7 @@ const TopProducts = () => {
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="fw-bold mb-0">Top Products</h5>
-          <span className="text-muted small">Sorted by quantity sold</span>
+          <span className="text-muted small"> Best Sellers</span>
         </div>
 
         {rankedProducts.length === 0 ? (

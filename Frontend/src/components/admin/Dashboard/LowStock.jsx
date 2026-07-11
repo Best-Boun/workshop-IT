@@ -27,7 +27,11 @@ const LowStock = () => {
   return (
     <div className="card shadow-sm border-0 h-100">
       <div className="card-body">
-        <h5 className="fw-bold mb-3">Low Stock Products</h5>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold mb-0">Low Stock Products</h5>
+
+          <span className="text-muted small">{products.length} Items</span>
+        </div>
 
         {products.length === 0 ? (
           <div className="text-center text-muted py-5">
@@ -48,7 +52,13 @@ const LowStock = () => {
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id}>
-                    <td>{product.name}</td>
+                    <td
+                      className="text-truncate"
+                      style={{ maxWidth: "180px" }}
+                      title={product.name}
+                    >
+                      {product.name}
+                    </td>
 
                     <td>{product.brand}</td>
 

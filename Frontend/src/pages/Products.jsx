@@ -126,6 +126,8 @@ const Products = () => {
 
   const writeCartSnapshot = (cart) => {
     localStorage.setItem("cart", JSON.stringify(cart));
+
+    window.dispatchEvent(new Event("cartUpdated"));
   };
 
   const getQuantityFromSnapshot = (cart, productId) => {
