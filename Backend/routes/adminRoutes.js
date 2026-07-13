@@ -25,4 +25,7 @@ router.delete("/:id", authMiddleware, adminOnly, AdminController.deleteAdmin);
 // PUT /api/admin/:id/permissions → อัปเดต permissions
 router.put("/:id/permissions", authMiddleware, adminOnly, AdminController.updateAdminPermissions);
 
+// POST /api/admin/promote → เลื่อน user ธรรมดาเป็น admin ย่อย
+router.post("/promote", authMiddleware, adminOnly, AdminController.promoteToAdmin);
+
 export default router;

@@ -210,6 +210,46 @@ class AdminController {
     }
   }
 
+  static async promoteToAdmin(req, res) {
+    try {
+      const { email } = req.body;
+      if (!email || typeof email !== "string") {
+        return res.status(400).json({ success: false, message: "Email is required" });
+      }
+
+      const result = await UserModel.promoteToAdmin(email.trim().toLowerCase());
+
+      if (result.error === "not_found") {
+        return res
+          .status(404)
+          .json({ success: false, message: "ไม่พบผู้ใช้งานที่มีอีเมลนี้ในระบบ" });
+      }
+      if (result.error === "already_admin") {
+        return res
+          .status(400)
+          .json({ success: false, message: "ผู้ใช้งานนี้เป็นแอดมินอยู่แล้ว" });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "เพิ่มแอดมินย่อยสำเร็จ",
+        data: {
+          id: result.user.id,
+          first_name: result.user.first_name,
+          last_name: result.user.last_name,
+          email: result.user.email,
+          role: "admin",
+          permissions: result.defaultPermissions,
+        },
+      });
+    } catch (error) {
+      console.error("promoteToAdmin error:", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to promote user to admin" });
+    }
+  }
+
   static async updateAdminPermissions(req, res) {
     try {
       const { id } = req.params;

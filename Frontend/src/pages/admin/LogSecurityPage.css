@@ -38,6 +38,7 @@
 .summary-card,
 .content-card,
 .access-card {
+  color: #000308;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
@@ -51,11 +52,12 @@
 .summary-label {
   display: block;
   margin-bottom: 0.35rem;
-  color: #6b7280;
+  color: #000308;
   font-size: 0.9rem;
 }
 
 .summary-card strong {
+  color: #000308;
   font-size: 1rem;
 }
 
@@ -104,6 +106,7 @@
 }
 
 .card-title-row h3 {
+  color: #000308;
   margin: 0;
   font-size: 1.05rem;
 }
@@ -118,6 +121,7 @@
 }
 
 table {
+  color: #000308;
   width: 100%;
   border-collapse: collapse;
 }
@@ -181,6 +185,7 @@ th {
 }
 
 .backup-value {
+  color: #000308;
   margin: 0;
   font-weight: 700;
 }

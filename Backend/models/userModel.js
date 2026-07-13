@@ -110,6 +110,35 @@ class UserModel {
     return result.affectedRows;
   }
 
+  // เลื่อน user ธรรมดาเป็น admin ย่อย
+  static async promoteToAdmin(email) {
+    const [rows] = await pool.execute(
+      "SELECT id, first_name, last_name, email, role FROM users WHERE email = ? LIMIT 1",
+      [email],
+    );
+    const user = rows[0];
+    if (!user) return { error: "not_found" };
+    if (user.role === "admin" || user.role === "superadmin") return { error: "already_admin" };
+
+    const defaultPermissions = {
+      dashboard: { view: false, manage: false },
+      products: { view: false, manage: false },
+      categories: { view: false, manage: false },
+      orders: { view: false, manage: false },
+      customers: { view: false, manage: false },
+      reports: { view: false, manage: false },
+      logsSecurity: { view: false, manage: false },
+      adminManagement: { view: false, manage: false },
+    };
+
+    await pool.execute(
+      "UPDATE users SET role = 'admin', permissions = ? WHERE id = ?",
+      [JSON.stringify(defaultPermissions), user.id],
+    );
+
+    return { success: true, user, defaultPermissions };
+  }
+
   // เพิ่มผู้ใช้ใหม่
   static async create(userData) {
     const {

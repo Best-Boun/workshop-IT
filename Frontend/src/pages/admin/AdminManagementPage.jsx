@@ -78,6 +78,10 @@ const AdminManagementPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(null);
+  const [promoteEmail, setPromoteEmail] = useState("");
+  const [promoting, setPromoting] = useState(false);
+  const [promoteError, setPromoteError] = useState(null);
+  const [promoteSuccess, setPromoteSuccess] = useState(null);
 
   const loadAdmins = async () => {
     try {
@@ -157,6 +161,29 @@ const AdminManagementPage = () => {
     }
   };
 
+  const handlePromoteAdmin = async (e) => {
+    e.preventDefault();
+    if (!canManageAdminManagement) return;
+
+    const trimmedEmail = promoteEmail.trim();
+    if (!trimmedEmail) return;
+
+    try {
+      setPromoting(true);
+      setPromoteError(null);
+      setPromoteSuccess(null);
+      const res = await api.post("/admin/promote", { email: trimmedEmail });
+      const newAdmin = res.data.data;
+      setAdmins((prev) => [...prev, newAdmin]);
+      setPromoteEmail("");
+      setPromoteSuccess(`เพิ่ม ${newAdmin.first_name} ${newAdmin.last_name} เป็นแอดมินย่อยสำเร็จ`);
+    } catch (err) {
+      setPromoteError(err.response?.data?.message || "ไม่สามารถเพิ่มแอดมินได้");
+    } finally {
+      setPromoting(false);
+    }
+  };
+
   const handleDeleteAdmin = async (adminId) => {
     if (!canManageAdminManagement) return;
 
@@ -184,6 +211,40 @@ const AdminManagementPage = () => {
 
       {error && (
         <div className="alert alert-danger rounded-4">{error}</div>
+      )}
+
+      {canManageAdminManagement && (
+        <div className="card shadow-sm border-0 rounded-4 mb-4 p-4">
+          <h6 className="fw-bold mb-3">เพิ่มแอดมินย่อยใหม่</h6>
+          <form onSubmit={handlePromoteAdmin} className="d-flex flex-column flex-sm-row gap-2">
+            <input
+              type="email"
+              className="form-control rounded-3"
+              placeholder="กรอกอีเมลของผู้ใช้ที่ต้องการเพิ่มเป็นแอดมินย่อย"
+              value={promoteEmail}
+              onChange={(e) => {
+                setPromoteEmail(e.target.value);
+                setPromoteError(null);
+                setPromoteSuccess(null);
+              }}
+              disabled={promoting}
+              required
+            />
+            <button
+              type="submit"
+              className="btn btn-primary rounded-3 text-nowrap"
+              disabled={promoting || !promoteEmail.trim()}
+            >
+              {promoting ? "กำลังเพิ่ม..." : "ยืนยันเพิ่มแอดมิน"}
+            </button>
+          </form>
+          {promoteError && (
+            <div className="alert alert-danger mt-2 mb-0 py-2 rounded-3">{promoteError}</div>
+          )}
+          {promoteSuccess && (
+            <div className="alert alert-success mt-2 mb-0 py-2 rounded-3">{promoteSuccess}</div>
+          )}
+        </div>
       )}
 
       <div className="mb-4 d-flex justify-content-end">
